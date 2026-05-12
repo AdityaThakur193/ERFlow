@@ -11,7 +11,11 @@ export default function DashboardPage() {
 
       const data = await response.json();
 
-      setPatients(data.data);
+      if (data.success) {
+        setPatients(data.data || []);
+      } else {
+        setPatients([]);
+      }
     } catch (error) {
       console.log("FETCH PATIENT ERROR:", error);
     }
