@@ -74,27 +74,21 @@ export async function PATCH(req) {
 export async function GET(req) {
   try {
     await connectToDb();
-    const patients = await Patient.find({}).sort({ createdAt: -1 });
+    const patients = await Patient.find({})
+      .populate("doctor") // Populate the doctor field
+      .sort({ createdAt: -1 });
     return NextResponse.json(
       {
         success: true,
         data: patients,
       },
-      {
-        status: 200,
-      },
+      { status: 200 }
     );
   } catch (error) {
     console.log("GET PATIENTS ERROR:", error);
-
     return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch patients",
-      },
-      {
-        status: 500,
-      },
+      { success: false, message: "Failed to fetch patients" },
+      { status: 500 }
     );
   }
 }
