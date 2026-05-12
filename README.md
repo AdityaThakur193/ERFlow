@@ -37,9 +37,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 to do :
 1.add props to the header to imporeve ui ux
+2.finish the static doctors page
 
 
 done in recent commit:
-1.added patch delete in patients 
-2.added patient page 
-3.
+1.added equipment apis (POST PATCH DEL)
+3.added frotend of the equipment

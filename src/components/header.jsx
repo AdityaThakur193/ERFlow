@@ -1,7 +1,7 @@
 "use client";
 import AddPatientModal from "@/components/patients/AddPatientModal";
-
-export default function Header() {
+import AddEquipmentModal from "./equipment/AddEquipmentModal";
+export default function Header(props) {
   return (
     <header
       className="
@@ -38,18 +38,7 @@ export default function Header() {
           <AddPatientModal />
 
           {/* Equipment */}
-          <button
-            className="
-              bg-zinc-100 hover:bg-zinc-200
-              text-black
-              px-4 py-2
-              rounded-xl
-              text-sm font-medium
-              transition-all
-            "
-          >
-            + Equipment
-          </button>
+          <AddEquipmentModal />
 
           {/* ER Status */}
           <div
@@ -67,6 +56,10 @@ export default function Header() {
               ER Stable
             </span>
           </div>
+          {/* add later if need to improve ui ux */}
+          {/* <div>
+            <h1>{props.name}</h1>
+          </div> */}
         </div>
       </div>
     </header>
