@@ -37,9 +37,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 to do :
 1.add props to the header to imporeve ui ux
-2.finish the static doctors page
+2.add doctor to a patient manually
+3.in equipment add deassign functionality
 
 
 done in recent commit:
-1.added equipment apis (POST PATCH DEL)
-3.added frotend of the equipment
+1.update header with doctor routes
+2.created dynamic doctor page
