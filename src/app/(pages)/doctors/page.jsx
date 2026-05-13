@@ -13,7 +13,7 @@ export default function DoctorsPage() {
     try {
       const response = await fetch("/api/adddoctor");
       const data = await response.json();
-
+      
       if (data.success) {
         setDoctors(data.data || []);
       } else {

@@ -55,50 +55,50 @@ export async function DELETE(req) {
   }
 }
 
-// export async function PATCH(req) {
-//   try {
-//     await connectToDb();
-//     const body = await req.json();
+export async function PATCH(req) {
+  try {
+    await connectToDb();
+    const body = await req.json();
 
-//     const updatedEquipment = await Equipment.findByIdAndUpdate(
-//       body.id,
-//       {
-//         status: body.status,
-//         assignedPatient: body.assignedPatient || null,
-//       },
-//       { new: true },
-//     );
-//     //update the patient aswell
-//     await Patient.findByIdAndUpdate(body.assignedPatient, {
-//       $push: {
-//         equipment: updatedEquipment._id,
-//       },
-//     });
-//     return NextResponse.json(
-//       {
-//         success: true,
-//         message: "Equipment assigned successfully",
+    const updatedEquipment = await Equipment.findByIdAndUpdate(
+      body.id,
+      {
+        status: body.status,
+        assignedPatient: body.assignedPatient || null,
+      },
+      { new: true },
+    );
+    //update the patient aswell
+    await Patient.findByIdAndUpdate(body.assignedPatient, {
+      $push: {
+        equipment: updatedEquipment._id,
+      },
+    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Equipment assigned successfully",
 
-//         data: updatedEquipment,
-//       },
-//       {
-//         status: 200,
-//       },
-//     );
-//   } catch (error) {
-//     console.log("PATCH EQUIPMENT ERROR:", error);
+        data: updatedEquipment,
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.log("PATCH EQUIPMENT ERROR:", error);
 
-//     return NextResponse.json(
-//       {
-//         success: false,
-//         message: "Failed to update equipment",
-//       },
-//       {
-//         status: 500,
-//       },
-//     );
-//   }
-// }
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Failed to update equipment",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
 
 export async function GET() {
   try {

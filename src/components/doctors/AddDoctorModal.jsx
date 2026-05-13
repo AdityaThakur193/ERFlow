@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AddDoctorModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function AddDoctorModal() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Doctor Added Successfully");
+        toast("Doctor Added Successfully");
         setIsOpen(false);
         setFormData({
           name: "",
@@ -74,7 +75,10 @@ export default function AddDoctorModal() {
             </div>
 
             {/* FORM */}
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
               {/* DOCTOR NAME */}
               <div className="flex flex-col gap-2">
                 <label className="text-sm text-zinc-600">Doctor Name</label>

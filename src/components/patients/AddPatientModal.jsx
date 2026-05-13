@@ -1,5 +1,5 @@
 "use client";
-
+import toast from "react-hot-toast";
 import { useState } from "react";
 
 export default function AddPatientModal() {
@@ -32,7 +32,7 @@ export default function AddPatientModal() {
       // console.log(data);
 
       if (response.ok) {
-        alert("Patient Added Successfully");
+        toast("✅ Patient Added Successfully");
 
         setIsOpen(false);
 
