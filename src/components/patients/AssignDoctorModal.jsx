@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { X, Stethoscope } from "lucide-react";
 
 export default function AssignDoctorModal({ patientId, onAssigned }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,12 +15,12 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
       const res = await fetch("/api/adddoctor");
       const data = await res.json();
       if (data.success) {
-        // Only show available doctors
         const available = data.data.filter((d) => d.status === "Available");
         setDoctors(available);
       }
     } catch (error) {
-      console.log("FETCH DOCTORS ERROR:", error);
+      console.error("FETCH DOCTORS ERROR:", error);
+      toast.error("Failed to load doctors");
     }
   }
 
@@ -31,7 +32,7 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
 
   async function handleAssign() {
     if (!selectedDoctor) {
-      toast("Please select a doctor");
+      toast.error("Please select a doctor");
       return;
     }
 
@@ -49,16 +50,16 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
       const data = await res.json();
 
       if (data.success) {
-        toast("Doctor assigned successfully! Patient is now in treatment.");
+        toast.success("Doctor assigned successfully!");
         setIsOpen(false);
         setSelectedDoctor("");
         if (onAssigned) onAssigned();
       } else {
-        toast(data.message || "Failed to assign doctor");
+        toast.error(data.message || "Failed to assign doctor");
       }
     } catch (error) {
-      console.log("ASSIGN DOCTOR ERROR:", error);
-      toast("An error occurred");
+      console.error("ASSIGN DOCTOR ERROR:", error);
+      toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -68,53 +69,75 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs hover:bg-blue-200 transition-colors"
+        className="btn btn-primary text-xs py-1.5 flex items-center gap-1"
       >
-        Treat
+        <Stethoscope size={14} />
+        Assign Doctor
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 p-6">
+        <div
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
+        >
+          <div className="modal-content">
             {/* Header */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-black">
-                Assign Doctor
-              </h1>
-              <p className="text-sm text-zinc-500 mt-1">
-                Select an available doctor to treat this patient
-              </p>
-            </div>
-
-            {/* Doctor Select */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-zinc-600 mb-2">
-                Available Doctors
-              </label>
-              <select
-                value={selectedDoctor}
-                onChange={(e) => setSelectedDoctor(e.target.value)}
-                className="w-full border border-zinc-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500/50"
-              >
-                <option value="">Select a doctor</option>
-                {doctors.map((doc) => (
-                  <option key={doc._id} value={doc._id}>
-                    {doc.name} — {doc.specialization} (Room {doc.roomNumber})
-                  </option>
-                ))}
-              </select>
-              {doctors.length === 0 && (
-                <p className="text-sm text-zinc-400 mt-2">
-                  No doctors available at this time.
+            <div className="modal-header flex items-start justify-between">
+              <div>
+                <h2
+                  className="text-xl font-bold"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  Assign Doctor
+                </h2>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  Select an available physician to treat this patient
                 </p>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
+              </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="border border-zinc-300 px-4 py-2 rounded-xl text-black hover:bg-zinc-50"
+                className="btn-icon ml-auto"
+                aria-label="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="label label-required">Select Doctor</label>
+                <select
+                  value={selectedDoctor}
+                  onChange={(e) => setSelectedDoctor(e.target.value)}
+                  className="select"
+                >
+                  <option value="">Choose a doctor...</option>
+                  {doctors.map((doc) => (
+                    <option key={doc._id} value={doc._id}>
+                      Dr. {doc.name} — {doc.specialization} (Room {doc.roomNumber})
+                    </option>
+                  ))}
+                </select>
+                {doctors.length === 0 && (
+                  <p
+                    className="text-sm mt-2"
+                    style={{ color: "var(--color-warning)" }}
+                  >
+                    ⚠️ No doctors are available at this time. Please try again later.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="btn btn-secondary"
                 disabled={loading}
               >
                 Cancel
@@ -122,14 +145,7 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
               <button
                 onClick={handleAssign}
                 disabled={loading || !selectedDoctor || doctors.length === 0}
-                className={`
-                  px-5 py-2 rounded-xl text-white font-medium
-                  ${
-                    loading || !selectedDoctor || doctors.length === 0
-                      ? "bg-zinc-400 cursor-not-allowed"
-                      : "bg-black hover:bg-zinc-800"
-                  }
-                `}
+                className="btn btn-primary"
               >
                 {loading ? "Assigning..." : "Assign Doctor"}
               </button>

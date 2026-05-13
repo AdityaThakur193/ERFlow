@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { X, Plus } from "lucide-react";
 
 export default function AddEquipmentModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -15,240 +17,177 @@ export default function AddEquipmentModal() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/addequipment", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        toast("Equipment Added Successfully");
-
+        toast.success("Equipment registered successfully");
         setIsOpen(false);
-
         setFormData({
           name: "",
           category: "Ventilator",
           roomNumber: "",
           status: "Available",
         });
+      } else {
+        toast.error("Failed to register equipment");
       }
     } catch (error) {
-      console.log(error);
+      console.error("ADD EQUIPMENT ERROR:", error);
+      toast.error("An error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <>
-      {/* OPEN BUTTON */}
+      {/* Open Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="
-          bg-zinc-100
-          hover:bg-zinc-200
-          text-black
-          px-4 py-2
-          rounded-xl
-          text-sm font-medium
-          transition-all
-        "
+        className="btn btn-secondary flex items-center gap-2"
+        style={{ 
+          fontSize: "0.875rem",
+          fontWeight: "500",
+        }}
       >
-        + Equipment
+        <Plus size={18} />
+        <span>Add Equipment</span>
       </button>
 
-      {/* MODAL */}
+      {/* Modal */}
       {isOpen && (
         <div
-          className="
-            fixed inset-0 z-50
-            flex items-center justify-center
-            bg-black/40
-            p-4
-          "
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
         >
-          {/* BOX */}
-          <div
-            className="
-              w-full max-w-xl
-              bg-white
-              rounded-2xl
-              border border-zinc-200
-              p-6
-            "
-          >
-            {/* HEADER */}
-            <div className="flex items-center justify-between mb-6">
+          <div className="modal-content">
+            {/* Header */}
+            <div className="modal-header flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-semibold text-black">
-                  Add Equipment
-                </h1>
-
-                <p className="text-sm text-zinc-500 mt-1">
-                  Register emergency room equipment
+                <h2
+                  className="text-xl font-bold"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  Register Equipment
+                </h2>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  Add emergency room medical equipment
                 </p>
               </div>
-
               <button
                 onClick={() => setIsOpen(false)}
-                className="
-                  text-2xl
-                  text-zinc-500
-                "
+                className="btn-icon ml-auto"
+                aria-label="Close modal"
               >
-                ✕
+                <X size={20} />
               </button>
             </div>
 
-            {/* FORM */}
-            <form
-              onSubmit={handleSubmit}
-              className="
-                grid grid-cols-1
-                md:grid-cols-2
-                gap-4
-              "
-            >
-              {/* EQUIPMENT NAME */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Equipment Name</label>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="modal-body">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Equipment Name */}
+                <div className="form-group md:col-span-2">
+                  <label className="label label-required">Equipment Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., GE Ventilator Pro X"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className="input"
+                  />
+                </div>
 
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      name: e.target.value,
-                    })
-                  }
-                  className="
-                    border border-zinc-300
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                  "
-                />
-              </div>
+                {/* Category */}
+                <div className="form-group">
+                  <label className="label label-required">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    className="select"
+                  >
+                    <option value="Ventilator">Ventilator</option>
+                    <option value="ECG">ECG Machine</option>
+                    <option value="Wheelchair">Wheelchair</option>
+                    <option value="Monitor">Patient Monitor</option>
+                    <option value="Infusion Pump">Infusion Pump</option>
+                    <option value="Oxygen Cylinder">Oxygen Cylinder</option>
+                    <option value="Defibrillator">Defibrillator</option>
+                    <option value="Suction Unit">Suction Unit</option>
+                  </select>
+                </div>
 
-              {/* CATEGORY */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Category</label>
+                {/* Room/Location */}
+                <div className="form-group">
+                  <label className="label label-required">Location</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., ER-101"
+                    value={formData.roomNumber}
+                    onChange={(e) =>
+                      setFormData({ ...formData, roomNumber: e.target.value })
+                    }
+                    className="input"
+                  />
+                </div>
 
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      category: e.target.value,
-                    })
-                  }
-                  className="
-                    border border-zinc-300
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                  "
-                >
-                  <option value="Ventilator">Ventilator</option>
-
-                  <option value="ECG">ECG</option>
-
-                  <option value="Wheelchair">Wheelchair</option>
-
-                  <option value="Monitor">Monitor</option>
-
-                  <option value="Infusion Pump">Infusion Pump</option>
-
-                  <option value="Oxygen Cylinder">Oxygen Cylinder</option>
-                </select>
-              </div>
-
-              {/* ROOM NUMBER */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Room Number</label>
-
-                <input
-                  type="text"
-                  required
-                  value={formData.roomNumber}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      roomNumber: e.target.value,
-                    })
-                  }
-                  className="
-                    border border-zinc-300
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                  "
-                />
-              </div>
-
-              {/* STATUS */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Status</label>
-
-                <select
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      status: e.target.value,
-                    })
-                  }
-                  className="
-                    border border-zinc-300
-                    rounded-xl
-                    px-4 py-3
-                    outline-none
-                  "
-                >
-                  <option value="Available">Available</option>
-
-                  <option value="In Use">In Use</option>
-
-                  <option value="Maintenance">Maintenance</option>
-                </select>
-              </div>
-
-              {/* BUTTONS */}
-              <div className="md:col-span-2 flex justify-end gap-3 mt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="
-                    border border-zinc-300
-                    px-4 py-2
-                    rounded-xl
-                    text-black
-                  "
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="
-                    bg-black text-white
-                    px-5 py-2
-                    rounded-xl
-                  "
-                >
-                  Add Equipment
-                </button>
+                {/* Status */}
+                <div className="form-group md:col-span-2">
+                  <label className="label label-required">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                    className="select"
+                  >
+                    <option value="Available">Available</option>
+                    <option value="In Use">In Use</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Offline">Offline</option>
+                  </select>
+                </div>
               </div>
             </form>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="btn btn-primary"
+              >
+                {isSubmitting ? "Registering..." : "Register Equipment"}
+              </button>
+            </div>
           </div>
         </div>
       )}

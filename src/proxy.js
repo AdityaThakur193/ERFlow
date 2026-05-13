@@ -5,7 +5,8 @@ const AUTH_COOKIE_NAME = "erflow_auth";
 function isProtectedPath(pathname) {
   // Protect app pages that exist under /dashboard, /patients, /doctors, /equipment
   return [
-    "/",
+  
+
     "/dashboard",
     "/patients",
     "/doctors",
@@ -38,7 +39,6 @@ export function proxy(req) {
 
 export const config = {
   matcher: [
-    "/",
     "/dashboard",
     "/patients",
     "/doctors",

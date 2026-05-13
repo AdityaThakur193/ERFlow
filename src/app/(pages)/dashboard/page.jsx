@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Users, AlertTriangle, Clock3, Building2 } from "lucide-react";
 
 export default function DashboardPage() {
   const [patients, setPatients] = useState([]);
-  const [noPatients, setNoPatients] = useState(0);
-  
-  const limit = 10
-  
-  
 
   async function getPatients() {
     try {
@@ -18,8 +14,6 @@ export default function DashboardPage() {
 
       if (data.success) {
         setPatients(data.data || []);
-        setNoPatients(data.data.length);
-        console.log(data.data.length);
       } else {
         setPatients([]);
       }
@@ -31,6 +25,17 @@ export default function DashboardPage() {
   useEffect(() => {
     getPatients();
   }, []);
+
+  const totalPatients = patients.length;
+  const criticalPatients = patients.filter(
+    (patient) => patient.priority === "Critical"
+  ).length;
+  const waitingPatients = patients.filter(
+    (patient) => patient.status === "Waiting"
+  ).length;
+  const departmentsActive = new Set(
+    patients.map((patient) => patient.department).filter(Boolean)
+  ).size;
 
   return (
     <div className="flex flex-col gap-6">
@@ -44,85 +49,92 @@ export default function DashboardPage() {
         "
       >
         {/* Card 1 */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-5">
-          <p className="text-sm text-zinc-500">Total Active Patients</p>
+        <div className="metric-card metric-card-1 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium opacity-80">Total Active Patients</p>
+              <h1 className="text-4xl font-bold mt-3">{totalPatients}</h1>
+            </div>
+            <Users size={22} />
+          </div>
 
-          <h1 className="text-4xl font-bold mt-3">{patients.length}</h1>
-
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm mt-2 opacity-85">
             Patients currently inside the emergency room
           </p>
         </div>
 
         {/* Card 2 */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-5">
-          <p className="text-sm text-zinc-500">Critical Patients</p>
+        <div className="metric-card metric-card-2 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium opacity-80">Critical Patients</p>
+              <h1 className="text-4xl font-bold mt-3">{criticalPatients}</h1>
+            </div>
+            <AlertTriangle size={22} />
+          </div>
 
-          <h1 className="text-4xl font-bold text-red-500 mt-3">
-            {
-              patients.filter((patient) => patient.priority === "Critical")
-                .length
-            }
-          </h1>
-
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm mt-2 opacity-85">
             High priority emergency cases requiring immediate attention
           </p>
         </div>
 
         {/* Card 3 */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-5">
-          <p className="text-sm text-zinc-500">Waiting Patients</p>
+        <div className="metric-card metric-card-3 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium opacity-80">Waiting Patients</p>
+              <h1 className="text-4xl font-bold mt-3">{waitingPatients}</h1>
+            </div>
+            <Clock3 size={22} />
+          </div>
 
-          <h1 className="text-4xl font-bold mt-3">
-            {patients.filter((patient) => patient.status === "Waiting").length}
-          </h1>
-
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm mt-2 opacity-85">
             Patients currently waiting for treatment
           </p>
         </div>
 
         {/* Card 4 */}
-        <div className="bg-white rounded-2xl border border-zinc-200 p-5">
-          <p className="text-sm text-zinc-500">Departments Active</p>
+        <div className="metric-card metric-card-4 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium opacity-80">Departments Active</p>
+              <h1 className="text-4xl font-bold mt-3">{departmentsActive}</h1>
+            </div>
+            <Building2 size={22} />
+          </div>
 
-          <h1 className="text-4xl font-bold mt-3">6</h1>
-
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm mt-2 opacity-85">
             Emergency departments currently operating
           </p>
         </div>
       </section>
 
       {/* Queue Section */}
-      <section
-        className="
-          bg-white
-          rounded-2xl
-          border border-zinc-200
-          p-5
-        "
-      >
+      <section className="card rounded-2xl p-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold">Emergency Queue</h2>
+            <h2
+              className="text-xl font-semibold"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Emergency Queue
+            </h2>
 
-            <p className="text-sm text-zinc-500 mt-1">Patients in Queue</p>
+            <p
+              className="text-sm mt-1"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Patients in Queue
+            </p>
           </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+        <div className="table-container">
+          <table className="table min-w-[800px]">
             <thead>
-              <tr
-                className="
-                  border-b border-zinc-200
-                  text-left text-sm text-zinc-500
-                "
-              >
+              <tr>
                 <th className="pb-4">Patient</th>
                 <th className="pb-4">Age</th>
                 <th className="pb-4">Symptoms</th>
@@ -134,7 +146,7 @@ export default function DashboardPage() {
 
             <tbody className="text-sm">
               {patients.map((patient) => (
-                <tr key={patient._id} className="border-b border-zinc-100">
+                <tr key={patient._id}>
                   {/* Name */}
                   <td className="py-4 font-medium">{patient.name}</td>
 
@@ -147,19 +159,15 @@ export default function DashboardPage() {
                   {/* Priority */}
                   <td>
                     <span
-                      className={`
-                        px-3 py-1 rounded-full text-xs
-
-                        ${
-                          patient.priority === "Critical"
-                            ? "bg-red-100 text-red-700"
-                            : patient.priority === "High"
-                              ? "bg-orange-100 text-orange-700"
-                              : patient.priority === "Medium"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-green-100 text-green-700"
-                        }
-                      `}
+                      className={`badge ${
+                        patient.priority === "Critical"
+                          ? "badge-critical"
+                          : patient.priority === "High"
+                            ? "badge-high"
+                            : patient.priority === "Medium"
+                              ? "badge-medium"
+                              : "badge-low"
+                      }`}
                     >
                       {patient.priority}
                     </span>
@@ -170,7 +178,13 @@ export default function DashboardPage() {
 
                   {/* Status */}
                   <td>
-                    <span className="bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full text-xs">
+                    <span
+                      className={`badge ${
+                        patient.status === "Waiting"
+                          ? "badge-busy"
+                          : "badge-active"
+                      }`}
+                    >
                       {patient.status}
                     </span>
                   </td>
@@ -181,7 +195,10 @@ export default function DashboardPage() {
 
           {/* Empty State */}
           {patients.length === 0 && (
-            <div className="py-16 text-center text-zinc-400">
+            <div
+              className="py-16 text-center"
+              style={{ color: "var(--color-text-tertiary)" }}
+            >
               No patients found
             </div>
           )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Search, Filter, Trash2 } from "lucide-react";
 import AssignDoctorModal from "@/components/patients/AssignDoctorModal";
 
 export default function PatientsPage() {
@@ -12,9 +13,9 @@ export default function PatientsPage() {
     try {
       const response = await fetch("/api/addpatient");
       const data = await response.json();
-      setPatients(data.data);
+      setPatients(data.data || []);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching patients:", error);
     }
   }
 
@@ -22,8 +23,9 @@ export default function PatientsPage() {
     getPatients();
   }, []);
 
-  // DELETE PATIENT
   async function deletePatient(id) {
+    if (!confirm("Are you sure you want to delete this patient?")) return;
+    
     try {
       const response = await fetch("/api/addpatient", {
         method: "DELETE",
@@ -35,11 +37,10 @@ export default function PatientsPage() {
         getPatients();
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting patient:", error);
     }
   }
 
-  // UPDATE STATUS (legacy – keep for "Complete" button)
   async function updateStatus(id, status) {
     try {
       const response = await fetch("/api/addpatient", {
@@ -52,125 +53,234 @@ export default function PatientsPage() {
         getPatients();
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error updating status:", error);
     }
   }
 
-  // FILTERED PATIENTS
   const filteredPatients = useMemo(() => {
     return patients.filter((patient) => {
       const matchesSearch =
         patient.name.toLowerCase().includes(search.toLowerCase()) ||
         patient.symptoms.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === "All" ? true : patient.status === filter;
+      const matchesFilter = filter === "All" ? true : patient.priority === filter;
       return matchesSearch && matchesFilter;
     });
   }, [patients, search, filter]);
 
+  const getPriorityBadge = (priority) => {
+    switch (priority) {
+      case "Critical":
+        return "badge-critical";
+      case "High":
+        return "badge-high";
+      case "Medium":
+        return "badge-medium";
+      case "Low":
+        return "badge-low";
+      default:
+        return "badge-low";
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* ... (header and search/filter sections unchanged) ... */}
-
-      {/* Patients Table */}
-      <section className="bg-white rounded-2xl border border-zinc-200 p-5">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1100px]">
-            <thead>
-              <tr className="border-b border-zinc-200 text-left text-sm text-zinc-500">
-                <th className="pb-4">Patient</th>
-                <th className="pb-4">Age</th>
-                <th className="pb-4">Gender</th>
-                <th className="pb-4">Symptoms</th>
-                <th className="pb-4">Priority</th>
-                <th className="pb-4">Department</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4">Assigned Doctor</th>
-                <th className="pb-4">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody className="text-sm">
-              {filteredPatients.map((patient) => (
-                <tr key={patient._id} className="border-b border-zinc-100">
-                  <td className="py-4 font-medium">{patient.name}</td>
-                  <td>{patient.age}</td>
-                  <td>{patient.gender}</td>
-                  <td>{patient.symptoms}</td>
-                  <td>
-                    <span
-                      className={`
-                        px-3 py-1 rounded-full text-xs
-                        ${
-                          patient.priority === "Critical"
-                            ? "bg-red-100 text-red-700"
-                            : patient.priority === "High"
-                            ? "bg-orange-100 text-orange-700"
-                            : patient.priority === "Medium"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
-                        }
-                      `}
-                    >
-                      {patient.priority}
-                    </span>
-                  </td>
-                  <td>{patient.department}</td>
-                  <td>
-                    <span className="bg-zinc-100 text-zinc-700 px-3 py-1 rounded-full text-xs">
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td>
-                    {patient.doctor ? (
-                      <span className="text-blue-600 font-medium">
-                        {patient.doctor.name}
-                      </span>
-                    ) : (
-                      <span className="text-zinc-400 italic">Unassigned</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className="flex flex-wrap gap-2">
-                      {/* Treat button – only show for Waiting patients */}
-                      {patient.status === "Waiting" && (
-                        <AssignDoctorModal
-                          patientId={patient._id}
-                          onAssigned={getPatients}
-                        />
-                      )}
-
-                      {/* Complete button – only for In treatment patients */}
-                      {patient.status === "In treatment" && (
-                        <button
-                          onClick={() => updateStatus(patient._id, "Completed")}
-                          className="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs"
-                        >
-                          Complete
-                        </button>
-                      )}
-
-                      {/* Delete button */}
-                      <button
-                        onClick={() => deletePatient(patient._id)}
-                        className="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-xs"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Empty State */}
-          {filteredPatients.length === 0 && (
-            <div className="py-16 text-center text-zinc-400">
-              No patients found
+    <div className="space-y-6">
+      {/* Search and Filter Bar */}
+      <div className="card p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search */}
+          <div className="md:col-span-2">
+            <label className="label">Search Patients</label>
+            <div className="relative">
+              <Search
+                size={18}
+                className="absolute left-3 top-3"
+                style={{ color: "var(--color-text-tertiary)" }}
+              />
+              <input
+                type="text"
+                placeholder="Search by name or symptoms..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input pl-10"
+              />
             </div>
-          )}
+          </div>
+
+          {/* Priority Filter */}
+          <div>
+            <label className="label">Filter by Priority</label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="select"
+            >
+              <option value="All">All Priorities</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
         </div>
-      </section>
+      </div>
+
+      {/* Patients Table Card */}
+      <div className="card overflow-hidden">
+        <div className="p-6 border-b" style={{ borderColor: "var(--color-border-light)" }}>
+          <h2
+            className="text-xl font-bold"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            Patient Registry
+          </h2>
+          <p
+            className="text-sm mt-1"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            {filteredPatients.length} patient{filteredPatients.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {filteredPatients.length > 0 ? (
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>Age</th>
+                  <th>Gender</th>
+                  <th>Priority</th>
+                  <th>Department</th>
+                  <th>Symptoms</th>
+                  <th>Assigned Doctor</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPatients.map((patient) => (
+                  <tr key={patient._id}>
+                    <td>
+                      <div>
+                        <p
+                          className="font-medium"
+                          style={{ color: "var(--color-text-primary)" }}
+                        >
+                          {patient.name}
+                        </p>
+                        <p
+                          className="text-xs mt-0.5"
+                          style={{ color: "var(--color-text-tertiary)" }}
+                        >
+                          ID: {String(patient._id).substring(0, 8).toUpperCase()}
+                        </p>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
+                        {patient.age} yrs
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
+                        {patient.gender}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`badge ${getPriorityBadge(patient.priority)}`}>
+                        {patient.priority}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className="text-sm"
+                        style={{ color: "var(--color-text-secondary)" }}
+                      >
+                        {patient.department}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className="text-sm max-w-xs truncate block"
+                        style={{ color: "var(--color-text-secondary)" }}
+                      >
+                        {patient.symptoms}
+                      </span>
+                    </td>
+                    <td>
+                      {patient.doctor ? (
+                        <div>
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: "var(--color-primary)" }}
+                          >
+                            {patient.doctor.name}
+                          </p>
+                          <p
+                            className="text-xs"
+                            style={{ color: "var(--color-text-tertiary)" }}
+                          >
+                            {patient.doctor.specialization}
+                          </p>
+                        </div>
+                      ) : (
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: "var(--color-warning)" }}
+                        >
+                          ⊘ Unassigned
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="flex gap-2">
+                        {!patient.doctor && (
+                          <AssignDoctorModal
+                            patientId={patient._id}
+                            onAssigned={getPatients}
+                          />
+                        )}
+
+                        {patient.doctor && (
+                          <button
+                            onClick={() => updateStatus(patient._id, "Completed")}
+                            className="btn btn-secondary text-xs py-1.5"
+                          >
+                            Complete
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => deletePatient(patient._id)}
+                          className="btn btn-icon"
+                          title="Delete patient"
+                          aria-label="Delete patient"
+                        >
+                          <Trash2 size={16} style={{ color: "var(--color-danger)" }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <p
+              className="text-sm"
+              style={{ color: "var(--color-text-tertiary)" }}
+            >
+              {search || filter !== "All"
+                ? "No patients match your search filters"
+                : "No patients registered yet"}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { X, Plus } from "lucide-react";
 
 export default function AddDoctorModal() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     specialization: "Emergency Medicine",
@@ -14,6 +16,7 @@ export default function AddDoctorModal() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/adddoctor", {
@@ -27,7 +30,7 @@ export default function AddDoctorModal() {
       const data = await response.json();
 
       if (data.success) {
-        toast("Doctor Added Successfully");
+        toast.success("Doctor registered successfully");
         setIsOpen(false);
         setFormData({
           name: "",
@@ -36,129 +39,156 @@ export default function AddDoctorModal() {
           status: "Available",
         });
         window.location.reload();
+      } else {
+        toast.error("Failed to register doctor");
       }
     } catch (error) {
-      console.log("ADD DOCTOR ERROR:", error);
+      console.error("ADD DOCTOR ERROR:", error);
+      toast.error("An error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <>
-      {/* OPEN BUTTON */}
+      {/* Open Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-black text-white px-4 py-2 rounded-xl text-sm font-medium"
+        className="btn btn-info flex items-center gap-2"
+        style={{ 
+          fontSize: "0.875rem",
+          fontWeight: "500",
+        }}
       >
-        + Doctor
+        <Plus size={18} />
+        <span>Add Doctor</span>
       </button>
 
-      {/* MODAL */}
+      {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-xl bg-white rounded-2xl border border-zinc-200 p-6">
-            {/* HEADER */}
-            <div className="flex items-center justify-between mb-6">
+        <div
+          className="modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
+        >
+          <div className="modal-content">
+            {/* Header */}
+            <div className="modal-header flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-semibold text-black">
-                  Add Doctor
-                </h1>
-                <p className="text-sm text-zinc-500 mt-1">
-                  Register a new doctor to the emergency department
+                <h2
+                  className="text-xl font-bold"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  Register Doctor
+                </h2>
+                <p
+                  className="text-sm mt-1"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  Add a new physician to the emergency department
                 </p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-2xl text-zinc-500"
+                className="btn-icon ml-auto"
+                aria-label="Close modal"
               >
-                ✕
+                <X size={20} />
               </button>
             </div>
 
-            {/* FORM */}
-            <form
-              onSubmit={handleSubmit}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
-              {/* DOCTOR NAME */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Doctor Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="border border-zinc-300 rounded-xl px-4 py-3 outline-none"
-                />
-              </div>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="modal-body">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Doctor Name */}
+                <div className="form-group md:col-span-2">
+                  <label className="label label-required">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Dr. James Smith"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className="input"
+                  />
+                </div>
 
-              {/* SPECIALIZATION */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Specialization</label>
-                <select
-                  value={formData.specialization}
-                  onChange={(e) =>
-                    setFormData({ ...formData, specialization: e.target.value })
-                  }
-                  className="border border-zinc-300 rounded-xl px-4 py-3 outline-none"
-                >
-                  <option value="Emergency Medicine">Emergency Medicine</option>
-                  <option value="Cardiology">Cardiology</option>
-                  <option value="Neurology">Neurology</option>
-                  <option value="Orthopedics">Orthopedics</option>
-                  <option value="Pediatrics">Pediatrics</option>
-                  <option value="Anesthesiology">Anesthesiology</option>
-                  <option value="General Surgery">General Surgery</option>
-                </select>
-              </div>
+                {/* Specialization */}
+                <div className="form-group">
+                  <label className="label label-required">Specialization</label>
+                  <select
+                    value={formData.specialization}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        specialization: e.target.value,
+                      })
+                    }
+                    className="select"
+                  >
+                    <option value="Emergency Medicine">Emergency Medicine</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Anesthesiology">Anesthesiology</option>
+                    <option value="General Surgery">General Surgery</option>
+                  </select>
+                </div>
 
-              {/* ROOM NUMBER */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Room Number</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.roomNumber}
-                  onChange={(e) =>
-                    setFormData({ ...formData, roomNumber: e.target.value })
-                  }
-                  className="border border-zinc-300 rounded-xl px-4 py-3 outline-none"
-                />
-              </div>
+                {/* Room Number */}
+                <div className="form-group">
+                  <label className="label label-required">Room/Station</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., ER-101"
+                    value={formData.roomNumber}
+                    onChange={(e) =>
+                      setFormData({ ...formData, roomNumber: e.target.value })
+                    }
+                    className="input"
+                  />
+                </div>
 
-              {/* STATUS */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm text-zinc-600">Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({ ...formData, status: e.target.value })
-                  }
-                  className="border border-zinc-300 rounded-xl px-4 py-3 outline-none"
-                >
-                  <option value="Available">Available</option>
-                  <option value="busy">Busy</option>
-                </select>
-              </div>
-
-              {/* BUTTONS */}
-              <div className="md:col-span-2 flex justify-end gap-3 mt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="border border-zinc-300 px-4 py-2 rounded-xl text-black"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-black text-white px-5 py-2 rounded-xl"
-                >
-                  Add Doctor
-                </button>
+                {/* Status */}
+                <div className="form-group md:col-span-2">
+                  <label className="label label-required">Initial Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                    className="select"
+                  >
+                    <option value="Available">Available</option>
+                    <option value="Busy">Busy</option>
+                    <option value="On Break">On Break</option>
+                  </select>
+                </div>
               </div>
             </form>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="btn btn-primary"
+              >
+                {isSubmitting ? "Registering..." : "Register Doctor"}
+              </button>
+            </div>
           </div>
         </div>
       )}
