@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AssignEquipmentModal({ equipmentId }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,8 @@ export default function AssignEquipmentModal({ equipmentId }) {
       const response = await fetch("/api/addpatient");
 
       const data = await response.json();
+      console.log(data);
+      
 
       if (data.success) {
         setPatients(data.data || []);
@@ -52,7 +55,7 @@ export default function AssignEquipmentModal({ equipmentId }) {
       const data = await response.json();
 
       if (data.success) {
-        alert("Equipment Assigned Successfully");
+        toast("Equipment Assigned Successfully");
 
         setIsOpen(false);
 

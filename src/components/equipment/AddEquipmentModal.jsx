@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
+import toast from "react-hot-toast";
 
 export default function AddEquipmentModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,7 @@ export default function AddEquipmentModal() {
       const data = await response.json();
 
       if (data.success) {
-        alert("Equipment Added Successfully");
+        toast("Equipment Added Successfully");
 
         setIsOpen(false);
 

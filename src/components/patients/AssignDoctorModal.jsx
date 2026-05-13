@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function AssignDoctorModal({ patientId, onAssigned }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +15,7 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
       const data = await res.json();
       if (data.success) {
         // Only show available doctors
-        const available = data.data.filter(d => d.status === "Available");
+        const available = data.data.filter((d) => d.status === "Available");
         setDoctors(available);
       }
     } catch (error) {
@@ -30,7 +31,7 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
 
   async function handleAssign() {
     if (!selectedDoctor) {
-      alert("Please select a doctor");
+      toast("Please select a doctor");
       return;
     }
 
@@ -48,16 +49,16 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
       const data = await res.json();
 
       if (data.success) {
-        alert("Doctor assigned successfully! Patient is now in treatment.");
+        toast("Doctor assigned successfully! Patient is now in treatment.");
         setIsOpen(false);
         setSelectedDoctor("");
         if (onAssigned) onAssigned();
       } else {
-        alert(data.message || "Failed to assign doctor");
+        toast(data.message || "Failed to assign doctor");
       }
     } catch (error) {
       console.log("ASSIGN DOCTOR ERROR:", error);
-      alert("An error occurred");
+      toast("An error occurred");
     } finally {
       setLoading(false);
     }
@@ -77,7 +78,9 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
           <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 p-6">
             {/* Header */}
             <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-black">Assign Doctor</h1>
+              <h1 className="text-2xl font-semibold text-black">
+                Assign Doctor
+              </h1>
               <p className="text-sm text-zinc-500 mt-1">
                 Select an available doctor to treat this patient
               </p>
@@ -121,9 +124,10 @@ export default function AssignDoctorModal({ patientId, onAssigned }) {
                 disabled={loading || !selectedDoctor || doctors.length === 0}
                 className={`
                   px-5 py-2 rounded-xl text-white font-medium
-                  ${loading || !selectedDoctor || doctors.length === 0
-                    ? "bg-zinc-400 cursor-not-allowed"
-                    : "bg-black hover:bg-zinc-800"
+                  ${
+                    loading || !selectedDoctor || doctors.length === 0
+                      ? "bg-zinc-400 cursor-not-allowed"
+                      : "bg-black hover:bg-zinc-800"
                   }
                 `}
               >

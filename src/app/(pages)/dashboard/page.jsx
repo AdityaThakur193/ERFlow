@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 
-
 export default function DashboardPage() {
   const [patients, setPatients] = useState([]);
+  const [noPatients, setNoPatients] = useState(0);
+  
+  const limit = 10
+  
+  
 
   async function getPatients() {
     try {
@@ -14,6 +18,8 @@ export default function DashboardPage() {
 
       if (data.success) {
         setPatients(data.data || []);
+        setNoPatients(data.data.length);
+        console.log(data.data.length);
       } else {
         setPatients([]);
       }
