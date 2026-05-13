@@ -69,8 +69,8 @@ export async function PATCH(req) {
       body.id,
       {
         status: body.status,
-        roomNumber: body.roomNumber,
-        specialization: body.specialization,
+        // roomNumber: body.roomNumber,
+        // specialization: body.specialization,
       },
       { new: true }
     );

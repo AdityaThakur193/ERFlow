@@ -1,6 +1,7 @@
 import connectToDb from "@/dbconfig/dbconfig";
 import { NextResponse } from "next/server";
 import Patient from "@/models/Patients.schema";
+import Doctor from "@/models/Doctor.schema";
 
 //api to dele patient
 export async function DELETE(req) {
@@ -82,13 +83,13 @@ export async function GET(req) {
         success: true,
         data: patients,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.log("GET PATIENTS ERROR:", error);
     return NextResponse.json(
       { success: false, message: "Failed to fetch patients" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

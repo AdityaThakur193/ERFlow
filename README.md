@@ -6,4 +6,4 @@ Future Plans:
 5.improve ui/ux 
 
 done in recent commit:
-1.add doctor workflow
+1.fixed a bug in the patients api , fixes the "Schema hasn't been registered for model "Doctor"np
