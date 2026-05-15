@@ -1,72 +1,52 @@
+//this code is not in the repo completly in the local . 
+import connectToDb from "@/dbconfig/dbconfig";
 import { NextResponse } from "next/server";
-import crypto from "crypto";
-
-// Simple secure auth for this project:
-// - Uses env vars: ADMIN_EMAIL, ADMIN_PASSWORD, AUTH_SECRET
-// - Sets an HTTP-only cookie named: erflow_auth
-// - Cookie value is a signed payload (HMAC) containing an expiry timestamp.
-
-function sign(value, secret) {
-  return crypto.createHmac("sha256", secret).update(value).digest("hex");
-}
+import User from "@/models/User.schema";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const { email, password } = body || {};
+    await connectToDb()
+    const reqBody = await req.json();
+    const { email, password } = reqBody;
+    console.log(reqBody);
 
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-    const AUTH_SECRET = process.env.AUTH_SECRET;
-
-    if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !AUTH_SECRET) {
+    //check if user exits
+    const user = await User.findOne({ email });
+    if (!user) {
       return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Server auth is not configured. Please set ADMIN_EMAIL, ADMIN_PASSWORD, AUTH_SECRET in environment variables.",
-        },
-        { status: 500 }
+        { error: "User does not exist" },
+        { status: 400 }
       );
     }
-
-    if (String(email || "").trim().toLowerCase() !== String(ADMIN_EMAIL).toLowerCase()) {
-      return NextResponse.json(
-        { success: false, message: "Invalid email or password." },
-        { status: 401 }
-      );
+    //check if password correct
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return NextResponse.json({ error: "Invalid password" }, { status: 400 });
     }
 
-    if (String(password || "") !== String(ADMIN_PASSWORD)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid email or password." },
-        { status: 401 }
-      );
-    }
-
-    const expiresAt = Date.now() + 1000 * 60 * 60; // 1 hour
-    const payload = `${expiresAt}`;
-    const signature = sign(payload, AUTH_SECRET);
-
-    const res = NextResponse.json({ success: true }, { status: 200 });
-
-    res.cookies.set({
-      name: "erflow_auth",
-      value: `${payload}.${signature}`,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60, // seconds
+    //create token data
+    const tokenData = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      position:user.position
+    };
+    //create a Token
+    const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET, {
+      expiresIn: "1d",
     });
-
-    return res;
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Login failed." },
-      { status: 500 }
-    );
+    
+    const response = NextResponse.json({
+      message: "login successfully!",
+      success: true,
+    });
+    response.cookies.set("token", token, {
+      httpOnly: true,
+    });
+    return response;
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-

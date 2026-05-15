@@ -1,48 +1,67 @@
 import { NextResponse } from "next/server";
-
-const AUTH_COOKIE_NAME = "erflow_auth";
-
-function isProtectedPath(pathname) {
-  // Protect app pages that exist under /dashboard, /patients, /doctors, /equipment
-  return [
-  
-
-    "/dashboard",
-    "/patients",
-    "/doctors",
-    "/equipment",
-  ].includes(pathname);
-}
-
-function hasAuthCookie(req) {
-  const cookies = req.cookies;
-  return Boolean(cookies.get(AUTH_COOKIE_NAME));
-}
+import jwt from "jsonwebtoken";
 
 export function proxy(req) {
-  const { pathname, search } = req.nextUrl;
+  try {
+    const token = req.cookies.get("token")?.value;
 
-  if (!isProtectedPath(pathname)) {
+    // NO TOKEN
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    // VERIFY TOKEN
+    const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+
+    const pathname = req.nextUrl.pathname;
+
+    // DOCTOR ACCESS
+    if (decoded.position === "Doctor") {
+      const allowedRoutes = ["/patients", "/doctors"];
+
+      const isAllowed = allowedRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
+
+      if (!isAllowed) {
+        return NextResponse.redirect(new URL("/patients", req.url));
+      }
+    }
+
+    // RECEPTIONIST ACCESS
+    if (decoded.position === "Receptionist") {
+      const allowedRoutes = ["/dashboard", "/patients", "/equipment"];
+
+      const isAllowed = allowedRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
+
+      if (!isAllowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
+    // ADMIN ACCESS
+    // admin can access everything
+
     return NextResponse.next();
+  } catch (error) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
-
-  if (hasAuthCookie(req)) {
-    return NextResponse.next();
-  }
-
-  const loginUrl = req.nextUrl.clone();
-  loginUrl.pathname = "/login";
-  loginUrl.searchParams.set("redirect", pathname);
-
-  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
   matcher: [
+<<<<<<< ours
     "/dashboard",
     "/patients",
     "/doctors",
     "/equipment",
+=======
+    "/dashboard/:path*",
+    "/patients/:path*",
+    "/equipment/:path*",
+    "/doctors/:path*",
+>>>>>>> theirs
   ],
 };
-
