@@ -52,16 +52,10 @@ export function proxy(req) {
 
 export const config = {
   matcher: [
-<<<<<<< ours
-    "/dashboard",
-    "/patients",
-    "/doctors",
-    "/equipment",
-=======
     "/dashboard/:path*",
     "/patients/:path*",
     "/equipment/:path*",
     "/doctors/:path*",
->>>>>>> theirs
   ],
 };
+// updated proxy
