@@ -28,13 +28,13 @@ export default function DashboardPage() {
 
   const totalPatients = patients.length;
   const criticalPatients = patients.filter(
-    (patient) => patient.priority === "Critical"
+    (patient) => patient.priority === "Critical",
   ).length;
   const waitingPatients = patients.filter(
-    (patient) => patient.status === "Waiting"
+    (patient) => patient.status === "Waiting",
   ).length;
   const departmentsActive = new Set(
-    patients.map((patient) => patient.department).filter(Boolean)
+    patients.map((patient) => patient.department).filter(Boolean),
   ).size;
 
   return (
@@ -52,7 +52,9 @@ export default function DashboardPage() {
         <div className="metric-card metric-card-1 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium opacity-80">Total Active Patients</p>
+              <p className="text-sm font-medium opacity-80">
+                Total Active Patients
+              </p>
               <h1 className="text-4xl font-bold mt-3">{totalPatients}</h1>
             </div>
             <Users size={22} />
@@ -67,7 +69,9 @@ export default function DashboardPage() {
         <div className="metric-card metric-card-2 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium opacity-80">Critical Patients</p>
+              <p className="text-sm font-medium opacity-80">
+                Critical Patients
+              </p>
               <h1 className="text-4xl font-bold mt-3">{criticalPatients}</h1>
             </div>
             <AlertTriangle size={22} />
@@ -97,7 +101,9 @@ export default function DashboardPage() {
         <div className="metric-card metric-card-4 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium opacity-80">Departments Active</p>
+              <p className="text-sm font-medium opacity-80">
+                Departments Active
+              </p>
               <h1 className="text-4xl font-bold mt-3">{departmentsActive}</h1>
             </div>
             <Building2 size={22} />
@@ -131,8 +137,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Table */}
-        <div className="table-container">
-          <table className="table min-w-[800px]">
+        <div className="table-container w-full overflow-x-auto">
+          <table className="table w-full min-w-[700px]">
             <thead>
               <tr>
                 <th className="pb-4">Patient</th>
