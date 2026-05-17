@@ -152,3 +152,4 @@ ERFlow was built as a fast-paced MVP project focused on creating a realistic hea
 - Standardized API error responses and added inline form error states<br>
 - Restructured the landing page storyboard and integrated full Auth links<br>
 - Secured JWT sessions with 12-hour expirations<br>
+-to add theguy1234567 as contributor to this repo
