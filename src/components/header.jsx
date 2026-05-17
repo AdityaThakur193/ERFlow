@@ -133,11 +133,16 @@ export default function Header() {
                 gap-3
               "
             >
-              <AddPatientModal />
+              {(user?.position === "Admin" || user?.position === "Receptionist") && (
+                <AddPatientModal />
+              )}
 
-              <AddDoctorModal />
-
-              <AddEquipmentModal />
+              {user?.position === "Admin" && (
+                <>
+                  <AddDoctorModal />
+                  <AddEquipmentModal />
+                </>
+              )}
             </div>
           </div>
 

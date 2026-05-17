@@ -58,12 +58,21 @@ export default function HomePage() {
             ))}
           </nav>
 
-          <a
-            href="/login"
-            className="btn btn-primary px-5 py-2.5 text-sm"
-          >
-            Staff Login
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="/login"
+              className="text-sm font-medium transition hover:text-primary"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Login
+            </a>
+            <a
+              href="/register"
+              className="btn btn-primary px-4 py-2 text-sm"
+            >
+              Register
+            </a>
+          </div>
         </div>
       </header>
 
@@ -105,14 +114,11 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-              <a href="/login" className="btn btn-primary px-7 py-4 text-base">
-                Access Dashboard
+              <a href="/register" className="btn btn-primary px-7 py-4 text-base">
+                Get Started
               </a>
-              <a
-                href="#features"
-                className="btn btn-secondary px-7 py-4 text-base"
-              >
-                Explore Features
+              <a href="/login" className="btn btn-secondary px-7 py-4 text-base">
+                Login
               </a>
             </div>
 
@@ -194,14 +200,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* The Challenge / Problem Statement */}
+      <section id="challenge" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-3xl font-bold tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+          The Chaos of the Modern ER
+        </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-lg" style={{ color: "var(--color-text-secondary)" }}>
+          Emergency rooms are overwhelmed. Without real-time visibility into bed availability, staff location, and patient priorities, critical seconds are lost.
+        </p>
+      </section>
+
       {/* Features */}
-      <section id="features" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section id="features" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-14 text-center">
           <p
             className="text-sm font-semibold uppercase tracking-[0.25em]"
             style={{ color: "var(--color-text-tertiary)" }}
           >
-            Platform Features
+            The Solution
           </p>
           <h2
             className="mt-4 text-4xl font-bold tracking-tight"
@@ -210,8 +226,7 @@ export default function HomePage() {
             Built for Fast-Paced Emergency Departments
           </h2>
           <p className="mx-auto mt-5 max-w-3xl text-lg leading-8" style={{ color: "var(--color-text-secondary)" }}>
-            ERFlow simplifies emergency room coordination with patient tracking,
-            staff management, and equipment visibility.
+            ERFlow simplifies emergency room coordination by bringing order to the chaos.
           </p>
         </div>
 
@@ -265,17 +280,17 @@ export default function HomePage() {
 
             <div className="flex flex-col gap-4 sm:flex-row lg:justify-end">
               <a
-                href="/login"
+                href="/register"
                 className="btn px-7 py-4 text-base font-semibold"
                 style={{
                   backgroundColor: "var(--color-text-inverse)",
                   color: "var(--color-primary-active)",
                 }}
               >
-                Launch Dashboard
+                Create Account
               </a>
               <a
-                href="#features"
+                href="/login"
                 className="btn px-7 py-4 text-base font-semibold"
                 style={{
                   border: "1px solid color-mix(in srgb, var(--color-text-inverse) 30%, transparent)",
@@ -283,7 +298,7 @@ export default function HomePage() {
                   backgroundColor: "transparent",
                 }}
               >
-                Learn More
+                Login
               </a>
             </div>
           </div>

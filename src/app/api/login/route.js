@@ -12,18 +12,28 @@ export async function POST(req) {
     const { email, password } = reqBody;
     console.log(reqBody);
 
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Please provide email and password" },
+        { status: 400 }
+      );
+    }
+
     //check if user exits
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
-        { error: "User does not exist" },
+        { success: false, message: "User does not exist" },
         { status: 400 }
       );
     }
     //check if password correct
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Invalid password" }, 
+        { status: 400 }
+      );
     }
 
     //create token data
@@ -35,7 +45,7 @@ export async function POST(req) {
     };
     //create a Token
     const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "12h",
     });
     
     const response = NextResponse.json({
@@ -47,6 +57,7 @@ export async function POST(req) {
     });
     return response;
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("LOGIN ERROR:", error);
+    return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
   }
 }

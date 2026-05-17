@@ -13,11 +13,18 @@ export async function POST(req) {
 
     console.log(reqbody);
 
+    if (!username || !email || !password || !position) {
+      return NextResponse.json(
+        { success: false, message: "Please fill all fields" },
+        { status: 400 },
+      );
+    }
+
     const user = await User.findOne({ email });
 
     if (user) {
       return NextResponse.json(
-        { message: "User with email already exists" },
+        { success: false, message: "User with email already exists" },
         { status: 400 },
       );
     }
@@ -39,9 +46,12 @@ export async function POST(req) {
     });
   } catch (error) {
     console.log(
-      "Something went wrong while registering the user , in Register route",
+      "Something went wrong while registering the user, in Register route",
       error,
     );
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message || "Internal Server Error" }, 
+      { status: 500 }
+    );
   }
 }

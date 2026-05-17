@@ -56,6 +56,7 @@ export const config = {
     "/patients/:path*",
     "/equipment/:path*",
     "/doctors/:path*",
+    "/departments/:path*",
   ],
 };
 // updated proxy

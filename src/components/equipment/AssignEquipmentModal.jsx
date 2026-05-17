@@ -4,151 +4,111 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { X, Package } from "lucide-react";
 
-export default function AssignEquipmentModal({ equipmentId }) {
+export default function AssignEquipmentModal({ equipmentId, equipmentName, inventory, onAssigned }) {
   const [isOpen, setIsOpen] = useState(false);
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function getPatients() {
+  async function getActivePatients() {
     try {
       const response = await fetch("/api/addpatient");
       const data = await response.json();
-
       if (data.success) {
-        setPatients(data.data || []);
+        // Only show active (non-completed) patients
+        const active = (data.data || []).filter((p) => p.status !== "Completed");
+        setPatients(active);
       }
     } catch (error) {
-      console.error("FETCH PATIENTS ERROR:", error);
       toast.error("Failed to load patients");
     }
   }
 
   useEffect(() => {
     if (isOpen) {
-      getPatients();
+      getActivePatients();
+      setSelectedPatient("");
     }
   }, [isOpen]);
 
   async function assignEquipment() {
-    if (!selectedPatient) {
-      toast.error("Please select a patient");
-      return;
-    }
+    if (!selectedPatient) { toast.error("Please select a patient"); return; }
+    if (inventory <= 0) { toast.error("No inventory remaining for this equipment"); return; }
 
     setLoading(true);
     try {
       const response = await fetch("/api/addequipment", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: equipmentId,
-          status: "In Use",
+          action: "assign",
           assignedPatient: selectedPatient,
         }),
       });
-
       const data = await response.json();
-
       if (data.success) {
         toast.success("Equipment assigned successfully");
         setIsOpen(false);
-        window.location.reload();
+        if (onAssigned) onAssigned();
       } else {
-        toast.error("Failed to assign equipment");
+        toast.error(data.message || "Failed to assign equipment");
       }
     } catch (error) {
-      console.error("ASSIGN EQUIPMENT ERROR:", error);
       toast.error("An error occurred");
     } finally {
       setLoading(false);
     }
   }
 
+  // If inventory is 0, show disabled button
+  const isOutOfStock = inventory <= 0;
+
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => !isOutOfStock && setIsOpen(true)}
+        disabled={isOutOfStock}
         className="btn btn-primary text-xs py-1.5 flex items-center gap-1"
+        title={isOutOfStock ? "Out of stock" : "Assign to patient"}
       >
         <Package size={14} />
-        Assign
+        {isOutOfStock ? "Out of Stock" : "Assign"}
       </button>
 
       {isOpen && (
-        <div
-          className="modal-overlay"
-          onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
-        >
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}>
           <div className="modal-content">
-            {/* Header */}
             <div className="modal-header flex items-start justify-between">
               <div>
-                <h2
-                  className="text-xl font-bold"
-                  style={{ color: "var(--color-text-primary)" }}
-                >
-                  Assign Equipment
-                </h2>
-                <p
-                  className="text-sm mt-1"
-                  style={{ color: "var(--color-text-secondary)" }}
-                >
-                  Select a patient to assign this equipment to
+                <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Assign Equipment</h2>
+                <p className="text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
+                  {equipmentName} · <span style={{ color: "var(--color-success)" }}>{inventory} unit{inventory !== 1 ? "s" : ""} available</span>
                 </p>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="btn-icon ml-auto"
-                aria-label="Close modal"
-              >
-                <X size={20} />
-              </button>
+              <button onClick={() => setIsOpen(false)} className="btn-icon ml-auto" aria-label="Close modal"><X size={20} /></button>
             </div>
 
-            {/* Body */}
             <div className="modal-body">
               <div className="form-group">
-                <label className="label label-required">Select Patient</label>
-                <select
-                  value={selectedPatient}
-                  onChange={(e) => setSelectedPatient(e.target.value)}
-                  className="select"
-                >
+                <label className="label label-required">Select Active Patient</label>
+                <select value={selectedPatient} onChange={(e) => setSelectedPatient(e.target.value)} className="select">
                   <option value="">Choose a patient...</option>
                   {patients.map((patient) => (
                     <option key={patient._id} value={patient._id}>
-                      {patient.name} — {patient.department} ({patient.priority})
+                      {patient.name} — {patient.department} ({patient.priority}) [{patient.status}]
                     </option>
                   ))}
                 </select>
                 {patients.length === 0 && (
-                  <p
-                    className="text-sm mt-2"
-                    style={{ color: "var(--color-text-tertiary)" }}
-                  >
-                    No patients available
-                  </p>
+                  <p className="text-sm mt-2" style={{ color: "var(--color-text-tertiary)" }}>No active patients available</p>
                 )}
               </div>
             </div>
 
-            {/* Footer */}
             <div className="modal-footer">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="btn btn-secondary"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={assignEquipment}
-                disabled={loading || !selectedPatient || patients.length === 0}
-                className="btn btn-primary"
-              >
+              <button onClick={() => setIsOpen(false)} className="btn btn-secondary" disabled={loading}>Cancel</button>
+              <button onClick={assignEquipment} disabled={loading || !selectedPatient} className="btn btn-primary">
                 {loading ? "Assigning..." : "Assign Equipment"}
               </button>
             </div>

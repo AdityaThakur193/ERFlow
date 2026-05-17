@@ -19,13 +19,12 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     status: {
       type: String,
       enum: ["Waiting", "In treatment", "Completed"],
       default: "Waiting",
     },
-    // department shows what department treats the patient
+    // department stores department name string (dynamic, from Department collection)
     department: {
       type: String,
       required: true,
@@ -35,10 +34,13 @@ const patientSchema = new mongoose.Schema(
       enum: ["Critical", "High", "Medium", "Low"],
       default: "Low",
     },
-    doctor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
-    },
+    // ⭐ UPDATED: Now an array to support multiple doctors per patient
+    doctor: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Doctor",
+      },
+    ],
     equipment: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -49,6 +51,8 @@ const patientSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-const Patient =
-  mongoose.models.Patient || mongoose.model("Patient", patientSchema);
+if (mongoose.models.Patient) {
+  delete mongoose.models.Patient;
+}
+const Patient = mongoose.model("Patient", patientSchema);
 export default Patient;

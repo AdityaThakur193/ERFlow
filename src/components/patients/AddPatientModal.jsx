@@ -1,10 +1,11 @@
 "use client";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
 
-export default function AddPatientModal() {
+export default function AddPatientModal({ onAdded }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [departments, setDepartments] = useState([]);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -12,26 +13,51 @@ export default function AddPatientModal() {
     gender: "Male",
     symptoms: "",
     priority: "Medium",
-    department: "Emergency",
+    department: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch dynamic departments from DB
+  async function fetchDepartments() {
+    try {
+      const res = await fetch("/api/departments");
+      const data = await res.json();
+      if (data.success) {
+        setDepartments(data.data || []);
+        // Pre-select first department
+        if (data.data.length > 0) {
+          setFormData((prev) => ({ ...prev, department: data.data[0].name }));
+        }
+      }
+    } catch (error) {
+      console.error("FETCH DEPARTMENTS ERROR:", error);
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) fetchDepartments();
+  }, [isOpen]);
+
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!formData.department) {
+      toast.error("Please select a department");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/addpatient", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        toast.success("Patient added successfully");
+      const data = await response.json();
+
+      if (data.success || response.ok) {
+        toast.success("Patient registered successfully");
         setIsOpen(false);
         setFormData({
           name: "",
@@ -39,10 +65,11 @@ export default function AddPatientModal() {
           gender: "Male",
           symptoms: "",
           priority: "Medium",
-          department: "Emergency",
+          department: departments[0]?.name || "",
         });
+        if (onAdded) onAdded();
       } else {
-        toast.error("Failed to add patient");
+        toast.error(data.message || "Failed to add patient");
       }
     } catch (error) {
       console.error("ADD PATIENT ERROR:", error);
@@ -58,10 +85,7 @@ export default function AddPatientModal() {
       <button
         onClick={() => setIsOpen(true)}
         className="btn btn-primary flex items-center gap-2"
-        style={{ 
-          fontSize: "0.875rem",
-          fontWeight: "500",
-        }}
+        style={{ fontSize: "0.875rem", fontWeight: "500" }}
       >
         <Plus size={18} />
         <span>Add Patient</span>
@@ -167,23 +191,31 @@ export default function AddPatientModal() {
                   </select>
                 </div>
 
-                {/* Department */}
-                <div className="form-group">
+                {/* Department - dynamic from DB */}
+                <div className="form-group md:col-span-2">
                   <label className="label label-required">Department</label>
-                  <select
-                    value={formData.department}
-                    onChange={(e) =>
-                      setFormData({ ...formData, department: e.target.value })
-                    }
-                    className="select"
-                  >
-                    <option value="Emergency">Emergency</option>
-                    <option value="ICU">Intensive Care</option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Neurology">Neurology</option>
-                    <option value="Orthopedics">Orthopedics</option>
-                    <option value="General">General Ward</option>
-                  </select>
+                  {departments.length > 0 ? (
+                    <select
+                      value={formData.department}
+                      onChange={(e) =>
+                        setFormData({ ...formData, department: e.target.value })
+                      }
+                      className="select"
+                    >
+                      {departments.map((dept) => (
+                        <option key={dept._id} value={dept.name}>
+                          {dept.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: "var(--color-warning)" }}
+                    >
+                      ⚠️ No departments found. An Admin must create departments first.
+                    </p>
+                  )}
                 </div>
 
                 {/* Symptoms */}
@@ -213,9 +245,8 @@ export default function AddPatientModal() {
                 Cancel
               </button>
               <button
-                type="submit"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || departments.length === 0}
                 className="btn btn-primary"
               >
                 {isSubmitting ? "Adding..." : "Register Patient"}

@@ -15,12 +15,14 @@ export default function RegisterPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   async function handleRegister(e) {
     e.preventDefault();
 
     try {
       setLoading(true);
+      setErrorMsg("");
 
       const response = await fetch("/api/register", {
         method: "POST",
@@ -39,12 +41,15 @@ export default function RegisterPage() {
 
         router.push("/login");
       } else {
-        toast.error(data.message || "Registration Failed");
+        const errorText = data.message || "Registration Failed";
+        setErrorMsg(errorText);
+        toast.error(errorText);
       }
     } catch (error) {
       console.log(error);
-
-      toast.error("Something went wrong");
+      const errorText = "Something went wrong";
+      setErrorMsg(errorText);
+      toast.error(errorText);
     } finally {
       setLoading(false);
     }
@@ -116,6 +121,13 @@ export default function RegisterPage() {
             <option value="Doctor">Doctor</option>
             <option value="Receptionist">Receptionist</option>
           </select>
+
+          {/* ERROR DISPLAY */}
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100">
+              {errorMsg}
+            </div>
+          )}
 
           <button
             type="submit"

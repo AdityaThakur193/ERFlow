@@ -16,12 +16,14 @@ export default function LoginPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   async function handleLogin(e) {
     e.preventDefault();
 
     try {
       setLoading(true);
+      setErrorMsg("");
 
       const response = await fetch("/api/login", {
         method: "POST",
@@ -40,12 +42,15 @@ export default function LoginPage() {
 
         router.push("/dashboard");
       } else {
-        toast.error(data.error || "Login Failed");
+        const errorText = data.message || "Login Failed";
+        setErrorMsg(errorText);
+        toast.error(errorText);
       }
     } catch (error) {
       console.log(error);
-
-      toast.error("Something went wrong");
+      const errorText = "Something went wrong";
+      setErrorMsg(errorText);
+      toast.error(errorText);
     } finally {
       setLoading(false);
     }
@@ -138,6 +143,13 @@ export default function LoginPage() {
               required
             />
           </div>
+
+          {/* ERROR DISPLAY */}
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium border border-red-100">
+              {errorMsg}
+            </div>
+          )}
 
           {/* BUTTON */}
           <button
