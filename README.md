@@ -140,15 +140,15 @@ The current build emphasizes:
 ERFlow was built as a fast-paced MVP project focused on creating a realistic healthcare operations dashboard within a short development timeline.
 
 ### Future Plans:
-- Implement Real-Time "Page Specialist" Emergency Pager System
-- Develop 3D/Parallax landing page for high-end marketing
-- Add real-time Recharts/Chart.js analytics to the dashboard
-- Automate departments with aggregation pipelines
-- Improve UI/UX with micro-animations
+- Implement Real-Time "Page Specialist" Emergency Pager System<br>
+- Develop 3D/Parallax landing page for high-end marketing<br>
+- Add real-time Recharts/Chart.js analytics to the dashboard<br>
+- Automate departments with aggregation pipelines<br>
+- Improve UI/UX with micro-animations<br>
 
 ### Done in Recent Commits:
-- Enforced strict UI Role-Based Access Control (RBAC) across all pages
-- Added missing field validations for Login and Registration APIs
-- Standardized API error responses and added inline form error states
-- Restructured the landing page storyboard and integrated full Auth links
-- Secured JWT sessions with 12-hour expirations
+- Enforced strict UI Role-Based Access Control (RBAC) across all pages<br>
+- Added missing field validations for Login and Registration APIs<br>
+- Standardized API error responses and added inline form error states<br>
+- Restructured the landing page storyboard and integrated full Auth links<br>
+- Secured JWT sessions with 12-hour expirations<br>
