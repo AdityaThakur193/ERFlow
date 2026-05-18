@@ -140,16 +140,18 @@ The current build emphasizes:
 ERFlow was built as a fast-paced MVP project focused on creating a realistic healthcare operations dashboard within a short development timeline.
 
 ### Future Plans:
+- Integrate email service (Resend/Nodemailer) for automated staff credential delivery<br>
 - Implement Real-Time "Page Specialist" Emergency Pager System<br>
 - Develop 3D/Parallax landing page for high-end marketing<br>
-- Add real-time Recharts/Chart.js analytics to the dashboard<br>
+- Add real-time Recharts/Chart.js analytics to the Admin dashboard<br>
 - Automate departments with aggregation pipelines<br>
 - Improve UI/UX with micro-animations<br>
 
 ### Done in Recent Commits:
-- Enforced strict UI Role-Based Access Control (RBAC) across all pages<br>
-- Added missing field validations for Login and Registration APIs<br>
-- Standardized API error responses and added inline form error states<br>
-- Restructured the landing page storyboard and integrated full Auth links<br>
-- Secured JWT sessions with 12-hour expirations<br>
--to add theguy1234567 as contributor to this repo
+- **Security**: Replaced public registration with Admin-only secure staff onboarding flow<br>
+- **Security**: Hardened routing with `proxy.js` middleware, enforcing strict server-side RBAC<br>
+- **Features**: Implemented a dedicated "My Dashboard" for Doctors with priority statistics<br>
+- **Features**: Added global password change functionality for all staff roles<br>
+- **Architecture**: Unified User accounts and Doctor profiles with atomic database creation<br>
+- **Bug Fixes**: Resolved patient visibility bleed by strictly linking doctors via `userId`<br>
+- **Tooling**: Created `seed.js` and `reset.js` scripts for database management<br>
