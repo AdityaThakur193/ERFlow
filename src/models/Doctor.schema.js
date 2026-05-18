@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 
 const doctorSchema = new mongoose.Schema(
   {
+    // Links this Doctor profile to the User account (login) that owns it.
+    // Set at creation time so doctor-dashboard lookup never relies on name matching.
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     name: {
       type: String,
       required: true,
@@ -10,7 +17,6 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // ⭐ NEW: Which department this doctor belongs to
     department: {
       type: String,
       required: true,
@@ -24,7 +30,6 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // ⭐ NEW: Tracks all active patients this doctor is treating
     patients: [
       {
         type: mongoose.Schema.Types.ObjectId,

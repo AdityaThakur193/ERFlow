@@ -82,6 +82,17 @@ function PatientsPageInner() {
 
   const filteredPatients = useMemo(() => {
     return patients.filter((patient) => {
+      // Doctors see only their own patients
+      if (user?.position === "Doctor") {
+        const safeDoctors = Array.isArray(patient.doctor)
+          ? patient.doctor
+          : patient.doctor ? [patient.doctor] : [];
+        const isMyPatient = safeDoctors.some((doc) => {
+          if (doc.userId && user.id && String(doc.userId) === String(user.id)) return true;
+          return doc?.name?.toLowerCase() === (user.username || "").toLowerCase();
+        });
+        if (!isMyPatient) return false;
+      }
       const matchesSearch =
         patient.name.toLowerCase().includes(search.toLowerCase()) ||
         patient.symptoms.toLowerCase().includes(search.toLowerCase());
@@ -89,7 +100,7 @@ function PatientsPageInner() {
       const matchesStatus = statusFilter === "All" ? true : patient.status === statusFilter;
       return matchesSearch && matchesPriority && matchesStatus;
     });
-  }, [patients, search, priorityFilter, statusFilter]);
+  }, [patients, search, priorityFilter, statusFilter, user]);
 
   const getPriorityBadge = (priority) => {
     switch (priority) {
@@ -102,6 +113,24 @@ function PatientsPageInner() {
 
   return (
     <div className="space-y-6">
+      {/* Doctor-only info banner */}
+      {user?.position === "Doctor" && (
+        <div
+          className="rounded-2xl px-5 py-3 flex items-center gap-3 border"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--color-info) 10%, transparent)",
+            borderColor: "color-mix(in srgb, var(--color-info) 20%, transparent)",
+          }}
+        >
+          <span style={{ color: "var(--color-info)", fontSize: "1.1rem" }}>🩺</span>
+          <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            <strong style={{ color: "var(--color-text-primary)" }}>Showing your patients only.</strong>{" "}
+            For equipment assignment and priority stats, use your{" "}
+            <a href="/doctor-dashboard" style={{ color: "var(--color-info)", fontWeight: 600, textDecoration: "underline" }}>Doctor Dashboard</a>.
+          </p>
+        </div>
+      )}
+
       {/* Search and Filter Bar */}
       <div className="card p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Trash2 } from "lucide-react";
 import AssignEquipmentModal from "@/components/equipment/AssignEquipmentModal";
+import AddEquipmentModal from "@/components/equipment/AddEquipmentModal";
 import toast from "react-hot-toast";
 
 export default function EquipmentPage() {
@@ -98,6 +99,20 @@ export default function EquipmentPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
+            Equipment Management
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
+            Track and manage hospital equipment inventory
+          </p>
+        </div>
+        {user?.position === "Admin" && (
+          <AddEquipmentModal onAdded={getEquipment} />
+        )}
+      </div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="card p-6">

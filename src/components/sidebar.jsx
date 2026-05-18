@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { useTheme } from "@/hooks/useTheme";
 
-import { LayoutDashboard, Users, Stethoscope, Wrench, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, Stethoscope, Wrench, Building2, UserCog } from "lucide-react";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,6 +45,13 @@ export default function Sidebar() {
     },
 
     {
+      name: "My Dashboard",
+      href: "/doctor-dashboard",
+      icon: LayoutDashboard,
+      roles: ["Doctor"],
+    },
+
+    {
       name: "Patients",
       href: "/patients",
       icon: Users,
@@ -55,7 +62,7 @@ export default function Sidebar() {
       name: "Doctors",
       href: "/doctors",
       icon: Stethoscope,
-      roles: ["Admin", "Doctor"],
+      roles: ["Admin"],
     },
 
     {
@@ -68,6 +75,12 @@ export default function Sidebar() {
       name: "Departments",
       href: "/departments",
       icon: Building2,
+      roles: ["Admin"],
+    },
+    {
+      name: "Staff",
+      href: "/staff",
+      icon: UserCog,
       roles: ["Admin"],
     },
   ];

@@ -10,7 +10,6 @@ export async function POST(req) {
     await connectToDb()
     const reqBody = await req.json();
     const { email, password } = reqBody;
-    console.log(reqBody);
 
     if (!email || !password) {
       return NextResponse.json(
@@ -41,7 +40,7 @@ export async function POST(req) {
       id: user._id,
       username: user.username,
       email: user.email,
-      position:user.position
+      position: user.position,
     };
     //create a Token
     const token = await jwt.sign(tokenData, process.env.TOKEN_SECRET, {
@@ -54,6 +53,10 @@ export async function POST(req) {
     });
     response.cookies.set("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 12, // 12h — matches JWT expiry
     });
     return response;
   } catch (error) {

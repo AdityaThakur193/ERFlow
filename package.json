@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node --env-file=.env seed.js"
+    "seed": "node --env-file=.env seed.js",
+    "reset": "node --env-file=.env reset.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -165,10 +165,8 @@ export default function LoginPage() {
             className="text-xs leading-relaxed"
             style={{ color: "var(--color-text-tertiary)" }}
           >
-            Secure authentication uses an HTTP-only cookie.
-            {process.env.NODE_ENV !== "production"
-              ? " Dev credentials: admin@example.com / admin123"
-              : " Configure credentials using environment variables."}
+            Don&apos;t have an account? Contact your system administrator.
+            Accounts are created and managed exclusively by the Admin.
           </p>
         </form>
       </div>

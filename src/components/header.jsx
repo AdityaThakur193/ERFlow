@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import AddPatientModal from "@/components/patients/AddPatientModal";
-import AddEquipmentModal from "@/components/equipment/AddEquipmentModal";
-import AddDoctorModal from "@/components/doctors/AddDoctorModal";
+import ChangePasswordModal from "@/components/auth/ChangePasswordModal";
 
 import { useTheme } from "@/hooks/useTheme";
 
@@ -57,12 +56,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header
-      className="
-        relative
-        w-full
-      "
-    >
+    <header className="relative w-full">
       <div className="px-4 md:px-6 pt-[88px] md:pt-6 pb-4">
         <div
           className="
@@ -135,13 +129,6 @@ export default function Header() {
             >
               {(user?.position === "Admin" || user?.position === "Receptionist") && (
                 <AddPatientModal />
-              )}
-
-              {user?.position === "Admin" && (
-                <>
-                  <AddDoctorModal />
-                  <AddEquipmentModal />
-                </>
               )}
             </div>
           </div>
@@ -222,6 +209,9 @@ export default function Header() {
               </span>
             </button>
 
+            {/* CHANGE PASSWORD — available to all roles */}
+            <ChangePasswordModal username={user?.username} />
+
             {/* LOGOUT */}
             <button
               onClick={handleLogout}
@@ -253,6 +243,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
+    </header >
   );
 }
