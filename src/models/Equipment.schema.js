@@ -23,7 +23,7 @@ const equipmentSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ⭐ NEW: Track quantity. Decrements on assignment, increments on release.
+    //  NEW: Track quantity. Decrements on assignment, increments on release.
     inventory: {
       type: Number,
       default: 1,

@@ -34,7 +34,7 @@ const patientSchema = new mongoose.Schema(
       enum: ["Critical", "High", "Medium", "Low"],
       default: "Low",
     },
-    // ⭐ UPDATED: Now an array to support multiple doctors per patient
+    //  UPDATED: Now an array to support multiple doctors per patient
     doctor: [
       {
         type: mongoose.Schema.Types.ObjectId,
