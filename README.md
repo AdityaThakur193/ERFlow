@@ -1,4 +1,7 @@
 # ERFlow — Smart Emergency Room Priority Board
+TO login as admin use the following credentials 
+  email : admin@example.com
+  password:password123
 
 <p align="center">
   A modern hospital operations dashboard designed to help emergency rooms manage patients, equipment, and emergency workflows in real time.
