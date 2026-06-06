@@ -48,7 +48,7 @@ export async function POST(req) {
   }
 }
 
-// PATCH - Update doctor status (manual override)
+// PATCH - Update doctor status 
 export async function PATCH(req) {
   try {
     await connectToDb();

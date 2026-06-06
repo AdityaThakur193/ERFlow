@@ -24,12 +24,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     getPatients();
-    // ⭐ Auto-refresh every 10 seconds
     const interval = setInterval(getPatients, 10000);
     return () => clearInterval(interval);
   }, [getPatients]);
 
-  // ⭐ Only count ACTIVE patients (exclude Completed)
+  
   const activePatients = patients.filter(
     (p) => p.status === "Waiting" || p.status === "In treatment"
   );

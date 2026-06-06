@@ -138,7 +138,7 @@ export default function EquipmentPage() {
       <section className="card p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:w-96">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-tertiary)" }} />
+            <Search size={18} className="absolute right-4  top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-tertiary)" }} />
             <input
               type="text"
               placeholder="Search equipment..."

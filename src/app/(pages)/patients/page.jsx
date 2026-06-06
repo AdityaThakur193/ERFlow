@@ -137,7 +137,7 @@ function PatientsPageInner() {
           <div className="md:col-span-2">
             <label className="label">Search Patients</label>
             <div className="relative">
-              <Search size={18} className="absolute left-3 top-3" style={{ color: "var(--color-text-tertiary)" }} />
+              <Search size={18} className="absolute right-4 top-4" style={{ color: "var(--color-text-tertiary)" }} />
               <input
                 type="text"
                 placeholder="Search by name or symptoms..."
