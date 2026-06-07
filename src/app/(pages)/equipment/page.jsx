@@ -4,13 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, Trash2 } from "lucide-react";
 import AssignEquipmentModal from "@/components/equipment/AssignEquipmentModal";
 import AddEquipmentModal from "@/components/equipment/AddEquipmentModal";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function EquipmentPage() {
   const [equipment, setEquipment] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [user, setUser] = useState(null);
+  const [confirm, setConfirm] = useState(null);
 
   async function getEquipment() {
     try {
@@ -45,7 +47,6 @@ export default function EquipmentPage() {
   }, []);
 
   async function deleteEquipment(id) {
-    if (!confirm("Are you sure you want to remove this equipment?")) return;
     try {
       const response = await fetch("/api/addequipment", {
         method: "DELETE",
@@ -62,7 +63,6 @@ export default function EquipmentPage() {
   }
 
   async function unassignEquipment(id) {
-    if (!confirm("Unassign this equipment from its current patient?")) return;
     try {
       const response = await fetch("/api/addequipment", {
         method: "PATCH",
@@ -99,6 +99,7 @@ export default function EquipmentPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmModal state={confirm} onClose={() => setConfirm(null)} />
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -138,13 +139,13 @@ export default function EquipmentPage() {
       <section className="card p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:w-96">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-tertiary)" }} />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--color-text-tertiary)" }} />
             <input
               type="text"
               placeholder="Search equipment..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input pl-11 h-12"
+              className="input pl-10"
             />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -162,84 +163,82 @@ export default function EquipmentPage() {
       </section>
 
       {/* EQUIPMENT TABLE */}
-      <section className="card w-full overflow-hidden">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full min-w-[950px]">
+      <section className="card overflow-hidden">
+        {/* Desktop Table View */}
+        <div className="hidden md:block table-container" style={{ border: "none", borderRadius: 0 }}>
+          <table className="table">
             <thead>
-              <tr className="border-b" style={{ borderColor: "var(--color-border-light)" }}>
+              <tr>
                 {["Equipment", "Category", "Room", "Inventory", "Status", "Assigned Patient", "Actions"].map((h) => (
-                  <th key={h} className="px-6 py-5 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--color-text-secondary)" }}>
-                    {h}
-                  </th>
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filteredEquipment.map((item) => (
-                <tr
-                  key={item._id}
-                  className="border-b transition-colors duration-150 hover:bg-[var(--color-surface-hover)]"
-                  style={{ borderColor: "var(--color-border-light)" }}
-                >
+                <tr key={item._id}>
                   {/* NAME */}
-                  <td className="px-6 py-5">
+                  <td>
                     <div>
-                      <p className="font-semibold text-sm" style={{ color: "var(--color-text-primary)" }}>{item.name}</p>
-                      <p className="text-xs mt-1" style={{ color: "var(--color-text-tertiary)" }}>
+                      <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>{item.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-tertiary)" }}>
                         ID: {String(item._id).substring(0, 8).toUpperCase()}
                       </p>
                     </div>
                   </td>
 
                   {/* CATEGORY */}
-                  <td className="px-6 py-5 text-sm" style={{ color: "var(--color-text-primary)" }}>{item.category}</td>
+                  <td>{item.category}</td>
 
                   {/* ROOM */}
-                  <td className="px-6 py-5 text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{item.roomNumber}</td>
+                  <td className="font-medium" style={{ color: "var(--color-text-primary)" }}>{item.roomNumber}</td>
 
-                  {/* ⭐ INVENTORY */}
-                  <td className="px-6 py-5">
-                    <div>
-                      <p className="text-sm font-bold" style={{ color: item.inventory > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
-                        {item.inventory} available
-                      </p>
-                    </div>
+                  {/* INVENTORY */}
+                  <td>
+                    <span className="font-bold" style={{ color: item.inventory > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
+                      {item.inventory} units
+                    </span>
                   </td>
 
                   {/* STATUS */}
-                  <td className="px-6 py-5">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      item.status === "Available" ? "bg-green-100 text-green-700" :
-                      item.status === "In Use" ? "bg-blue-100 text-blue-700" :
-                      "bg-red-100 text-red-700"
+                  <td>
+                    <span className={`badge ${
+                      item.status === "Available" ? "badge-available" :
+                      item.status === "In Use" ? "badge-active" :
+                      "badge-warning"
                     }`}>
                       {item.status}
                     </span>
                   </td>
 
                   {/* ASSIGNED PATIENT */}
-                  <td className="px-6 py-5">
+                  <td>
                     {item.assignedPatient ? (
                       <div>
-                        <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>{item.assignedPatient.name}</p>
-                        <p className="text-xs" style={{ color: "var(--color-text-tertiary)" }}>{item.assignedPatient.department} · {item.assignedPatient.priority}</p>
+                        <p className="font-medium" style={{ color: "var(--color-text-primary)" }}>{item.assignedPatient.name}</p>
+                        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-tertiary)" }}>{item.assignedPatient.department} · {item.assignedPatient.priority}</p>
                         {(user?.position === "Admin" || user?.position === "Receptionist") && (
                           <button
-                            onClick={() => unassignEquipment(item._id)}
-                            className="text-xs mt-1 underline"
-                            style={{ color: "var(--color-warning)" }}
+                            onClick={() => setConfirm({
+                              title: "Unassign Equipment",
+                              message: `Unassign this equipment from ${item.assignedPatient?.name}?`,
+                              confirmLabel: "Unassign",
+                              isDanger: false,
+                              onConfirm: () => unassignEquipment(item._id),
+                            })}
+                            className="btn btn-secondary text-xs py-1 px-2 mt-1"
                           >
                             Unassign
                           </button>
                         )}
                       </div>
                     ) : (
-                      <span className="text-sm" style={{ color: "var(--color-text-tertiary)" }}>Not Assigned</span>
+                      <span style={{ color: "var(--color-text-tertiary)" }}>Not assigned</span>
                     )}
                   </td>
 
                   {/* ACTIONS */}
-                  <td className="px-6 py-5">
+                  <td>
                     <div className="flex flex-wrap gap-2">
                       {(user?.position === "Admin" || user?.position === "Receptionist") && (
                         <AssignEquipmentModal
@@ -251,14 +250,18 @@ export default function EquipmentPage() {
                       )}
                       {user?.position === "Admin" && (
                         <button
-                          onClick={() => deleteEquipment(item._id)}
-                          className="px-3 py-2 rounded-xl text-xs font-medium transition-all duration-150"
-                          style={{
-                            backgroundColor: "color-mix(in srgb, var(--color-danger) 15%, transparent)",
-                            color: "var(--color-danger)",
-                          }}
+                          onClick={() => setConfirm({
+                            title: "Delete Equipment",
+                            message: `Remove this equipment from the system? This cannot be undone.`,
+                            confirmLabel: "Delete",
+                            isDanger: true,
+                            onConfirm: () => deleteEquipment(item._id),
+                          })}
+                          className="btn-icon"
+                          title="Delete equipment"
+                          aria-label="Delete equipment"
                         >
-                          Delete
+                          <Trash2 size={15} color="var(--color-danger)" />
                         </button>
                       )}
                     </div>
@@ -267,13 +270,112 @@ export default function EquipmentPage() {
               ))}
             </tbody>
           </table>
-
-          {filteredEquipment.length === 0 && (
-            <div className="py-20 text-center text-sm" style={{ color: "var(--color-text-tertiary)" }}>
-              No equipment found
-            </div>
-          )}
         </div>
+
+        {/* Mobile Card View */}
+        <div className="block md:hidden divide-y divide-[var(--color-border-light)]">
+          {filteredEquipment.map((item) => (
+            <div key={item._id} className="p-4 space-y-3 text-left">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-bold text-base" style={{ color: "var(--color-text-primary)" }}>{item.name}</h3>
+                  <p className="text-xs" style={{ color: "var(--color-text-tertiary)" }}>
+                    ID: {String(item._id).substring(0, 8).toUpperCase()}
+                  </p>
+                </div>
+                <span className={`badge ${
+                  item.status === "Available" ? "badge-available" :
+                  item.status === "In Use" ? "badge-active" :
+                  "badge-warning"
+                }`}>
+                  {item.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                <div>
+                  <span className="font-semibold" style={{ color: "var(--color-text-tertiary)" }}>Category:</span>
+                  <p className="mt-0.5">{item.category}</p>
+                </div>
+                <div>
+                  <span className="font-semibold" style={{ color: "var(--color-text-tertiary)" }}>Room:</span>
+                  <p className="mt-0.5">{item.roomNumber}</p>
+                </div>
+                <div>
+                  <span className="font-semibold" style={{ color: "var(--color-text-tertiary)" }}>Inventory:</span>
+                  <p className="mt-0.5 font-bold" style={{ color: item.inventory > 0 ? "var(--color-success)" : "var(--color-danger)" }}>
+                    {item.inventory} units
+                  </p>
+                </div>
+                <div>
+                  <span className="font-semibold" style={{ color: "var(--color-text-tertiary)" }}>Assigned Patient:</span>
+                  {item.assignedPatient ? (
+                    <div className="mt-0.5 font-medium" style={{ color: "var(--color-text-primary)" }}>
+                      <p>{item.assignedPatient.name}</p>
+                      <p className="text-[10px]" style={{ color: "var(--color-text-tertiary)" }}>
+                        {item.assignedPatient.department} · {item.assignedPatient.priority}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-0.5" style={{ color: "var(--color-text-tertiary)" }}>Not assigned</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[var(--color-border-light)] text-xs">
+                <div>
+                  {item.assignedPatient && (user?.position === "Admin" || user?.position === "Receptionist") && (
+                    <button
+                      onClick={() => setConfirm({
+                        title: "Unassign Equipment",
+                        message: `Unassign this equipment from ${item.assignedPatient?.name}?`,
+                        confirmLabel: "Unassign",
+                        isDanger: false,
+                        onConfirm: () => unassignEquipment(item._id),
+                      })}
+                      className="btn btn-secondary text-xs py-1.5 px-2.5"
+                    >
+                      Unassign
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {(user?.position === "Admin" || user?.position === "Receptionist") && (
+                    <AssignEquipmentModal
+                      equipmentId={item._id}
+                      equipmentName={item.name}
+                      inventory={item.inventory}
+                      onAssigned={getEquipment}
+                    />
+                  )}
+                  {user?.position === "Admin" && (
+                    <button
+                      onClick={() => setConfirm({
+                        title: "Delete Equipment",
+                        message: `Remove this equipment from the system? This cannot be undone.`,
+                        confirmLabel: "Delete",
+                        isDanger: true,
+                        onConfirm: () => deleteEquipment(item._id),
+                      })}
+                      className="btn-icon"
+                      title="Delete equipment"
+                      aria-label="Delete equipment"
+                    >
+                      <Trash2 size={15} color="var(--color-danger)" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredEquipment.length === 0 && (
+          <div className="py-16 text-center text-sm" style={{ color: "var(--color-text-tertiary)" }}>
+            No equipment found
+          </div>
+        )}
       </section>
     </div>
   );

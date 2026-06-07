@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Trash2, UserPlus, Users, ShieldCheck, Stethoscope, ClipboardList, Search } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import AddStaffModal from "@/components/staff/AddStaffModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const POSITION_CONFIG = {
   Admin: {
@@ -30,6 +31,7 @@ export default function StaffPage() {
   const [filterRole, setFilterRole] = useState("All");
   const [currentUser, setCurrentUser] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [confirm, setConfirm] = useState(null);
 
   async function fetchUsers() {
     try {
@@ -61,7 +63,6 @@ export default function StaffPage() {
   }, []);
 
   async function handleDelete(id, username) {
-    if (!confirm(`Remove "${username}" from the system? This cannot be undone.`)) return;
     setDeletingId(id);
     try {
       const res = await fetch("/api/users", {
@@ -97,6 +98,7 @@ export default function StaffPage() {
 
   return (
     <div className="space-y-6">
+      <ConfirmModal state={confirm} onClose={() => setConfirm(null)} />
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -190,125 +192,238 @@ export default function StaffPage() {
             <p style={{ color: "var(--color-text-tertiary)" }}>Loading staff...</p>
           </div>
         ) : filtered.length > 0 ? (
-          <div className="table-container" style={{ border: "none", borderRadius: 0 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Staff Member</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((user) => {
-                  const config = POSITION_CONFIG[user.position] || POSITION_CONFIG.Receptionist;
-                  const RoleIcon = config.icon;
-                  const isCurrentUser = currentUser?.id === String(user._id);
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block table-container" style={{ border: "none", borderRadius: 0 }}>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Staff Member</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((user) => {
+                    const config = POSITION_CONFIG[user.position] || POSITION_CONFIG.Receptionist;
+                    const RoleIcon = config.icon;
+                    const isCurrentUser = currentUser?.id === String(user._id);
 
-                  return (
-                    <tr key={user._id}>
-                      {/* Name + Avatar */}
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                    return (
+                      <tr key={user._id}>
+                        {/* Name + Avatar */}
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                              style={{
+                                backgroundColor: `color-mix(in srgb, ${config.color} 16%, transparent)`,
+                                color: config.color,
+                              }}
+                            >
+                              {user.username.slice(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                                {user.username}
+                                {isCurrentUser && (
+                                  <span
+                                    className="ml-2 text-xs font-medium px-1.5 py-0.5 rounded-full"
+                                    style={{
+                                      backgroundColor: "color-mix(in srgb, var(--color-primary) 18%, transparent)",
+                                      color: "var(--color-primary-active)",
+                                    }}
+                                  >
+                                    You
+                                  </span>
+                                )}
+                              </p>
+                              <p className="text-xs mt-0.5" style={{ color: "var(--color-text-tertiary)" }}>
+                                ID: {String(user._id).substring(0, 8).toUpperCase()}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Email */}
+                        <td>
+                          <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                            {user.email}
+                          </span>
+                        </td>
+
+                        {/* Role Badge */}
+                        <td>
+                          <span
+                            className="badge flex items-center gap-1.5 w-fit"
                             style={{
-                              backgroundColor: `color-mix(in srgb, ${config.color} 16%, transparent)`,
+                              backgroundColor: `color-mix(in srgb, ${config.color} 14%, transparent)`,
                               color: config.color,
                             }}
                           >
-                            {user.username.slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                              {user.username}
-                              {isCurrentUser && (
-                                <span
-                                  className="ml-2 text-xs font-medium px-1.5 py-0.5 rounded-full"
-                                  style={{
-                                    backgroundColor: "color-mix(in srgb, var(--color-primary) 18%, transparent)",
-                                    color: "var(--color-primary-active)",
-                                  }}
-                                >
-                                  You
-                                </span>
-                              )}
-                            </p>
-                            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-tertiary)" }}>
-                              ID: {String(user._id).substring(0, 8).toUpperCase()}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
+                            <RoleIcon size={12} />
+                            {user.position}
+                          </span>
+                        </td>
 
-                      {/* Email */}
-                      <td>
-                        <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                          {user.email}
-                        </span>
-                      </td>
+                        {/* Joined date */}
+                        <td>
+                          <span className="text-sm" style={{ color: "var(--color-text-tertiary)" }}>
+                            {user.createdAt
+                              ? new Date(user.createdAt).toLocaleString("en-US", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })
+                              : "—"}
+                          </span>
+                        </td>
 
-                      {/* Role Badge */}
-                      <td>
-                        <span
-                          className="badge flex items-center gap-1.5 w-fit"
+                        {/* Actions */}
+                        <td>
+                          {isCurrentUser ? (
+                            <span className="text-xs" style={{ color: "var(--color-text-disabled)" }}>
+                              —
+                            </span>
+                          ) : (
+                            <button
+                              id={`delete-user-${user._id}`}
+                              onClick={() => setConfirm({
+                                title: "Remove Staff Member",
+                                message: `Remove "${user.username}" from the system? This cannot be undone.`,
+                                confirmLabel: "Remove",
+                                isDanger: true,
+                                onConfirm: () => handleDelete(user._id, user.username),
+                              })}
+                              disabled={deletingId === user._id}
+                              className="btn-icon"
+                              title={`Remove ${user.username}`}
+                              aria-label={`Remove ${user.username}`}
+                            >
+                              <Trash2
+                                size={15}
+                                color={deletingId === user._id ? "var(--color-text-disabled)" : "var(--color-danger)"}
+                              />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="block md:hidden divide-y divide-[var(--color-border-light)]">
+              {filtered.map((user) => {
+                const config = POSITION_CONFIG[user.position] || POSITION_CONFIG.Receptionist;
+                const RoleIcon = config.icon;
+                const isCurrentUser = currentUser?.id === String(user._id);
+
+                return (
+                  <div key={user._id} className="p-4 space-y-3 text-left">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
                           style={{
-                            backgroundColor: `color-mix(in srgb, ${config.color} 14%, transparent)`,
+                            backgroundColor: `color-mix(in srgb, ${config.color} 16%, transparent)`,
                             color: config.color,
                           }}
                         >
-                          <RoleIcon size={12} />
-                          {user.position}
-                        </span>
-                      </td>
+                          {user.username.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-base flex items-center gap-1.5" style={{ color: "var(--color-text-primary)" }}>
+                            {user.username}
+                            {isCurrentUser && (
+                              <span
+                                className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                                style={{
+                                  backgroundColor: "color-mix(in srgb, var(--color-primary) 18%, transparent)",
+                                  color: "var(--color-primary-active)",
+                                }}
+                              >
+                                You
+                              </span>
+                            )}
+                          </h3>
+                          <p className="text-xs" style={{ color: "var(--color-text-tertiary)" }}>
+                            ID: {String(user._id).substring(0, 8).toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className="badge flex items-center gap-1.5 text-xs font-medium"
+                        style={{
+                          backgroundColor: `color-mix(in srgb, ${config.color} 14%, transparent)`,
+                          color: config.color,
+                        }}
+                      >
+                        <RoleIcon size={11} />
+                        {user.position}
+                      </span>
+                    </div>
 
-                      {/* Joined date */}
-                      <td>
-                        <span className="text-sm" style={{ color: "var(--color-text-tertiary)" }}>
+                    <div className="space-y-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      <div>
+                        <span className="font-semibold block text-[10px]" style={{ color: "var(--color-text-tertiary)" }}>Email:</span>
+                        <p className="mt-0.5 truncate">{user.email}</p>
+                      </div>
+                      <div>
+                        <span className="font-semibold block text-[10px]" style={{ color: "var(--color-text-tertiary)" }}>Joined:</span>
+                        <p className="mt-0.5">
                           {user.createdAt
-                            ? new Date(user.createdAt).toLocaleDateString("en-IN", {
+                            ? new Date(user.createdAt).toLocaleString("en-US", {
                                 day: "numeric",
                                 month: "short",
                                 year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
                               })
                             : "—"}
-                        </span>
-                      </td>
+                        </p>
+                      </div>
+                    </div>
 
-                      {/* Actions */}
-                      <td>
-                        {isCurrentUser ? (
-                          <span className="text-xs" style={{ color: "var(--color-text-disabled)" }}>
-                            —
-                          </span>
-                        ) : (
-                          <button
-                            id={`delete-user-${user._id}`}
-                            onClick={() => handleDelete(user._id, user.username)}
-                            disabled={deletingId === user._id}
-                            className="btn-icon"
-                            title={`Remove ${user.username}`}
-                            aria-label={`Remove ${user.username}`}
-                          >
-                            <Trash2
-                              size={16}
-                              style={{
-                                color: deletingId === user._id
-                                  ? "var(--color-text-disabled)"
-                                  : "var(--color-danger)",
-                              }}
-                            />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                    <div className="flex items-center justify-end pt-2 border-t border-[var(--color-border-light)]">
+                      {isCurrentUser ? (
+                        <span className="text-xs" style={{ color: "var(--color-text-disabled)" }}>
+                          —
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setConfirm({
+                            title: "Remove Staff Member",
+                            message: `Remove "${user.username}" from the system? This cannot be undone.`,
+                            confirmLabel: "Remove",
+                            isDanger: true,
+                            onConfirm: () => handleDelete(user._id, user.username),
+                          })}
+                          disabled={deletingId === user._id}
+                          className="btn-icon"
+                          title={`Remove ${user.username}`}
+                          aria-label={`Remove ${user.username}`}
+                        >
+                          <Trash2
+                            size={15}
+                            color={deletingId === user._id ? "var(--color-text-disabled)" : "var(--color-danger)"}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center">
             <UserPlus size={40} className="mx-auto mb-3" style={{ color: "var(--color-text-disabled)" }} />
@@ -333,7 +448,7 @@ export default function StaffPage() {
         <span className="text-lg shrink-0">🔑</span>
         <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
           <strong style={{ color: "var(--color-text-primary)" }}>Sharing credentials:</strong>{" "}
-          After creating an account, share the staff member's email and password directly in person
+          After creating an account, share the staff member&apos;s email and password directly in person
           or via your internal communication channel (e.g., WhatsApp, Slack). Remind them to keep
           their password private.
         </p>

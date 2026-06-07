@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import { X, Plus, Eye, EyeOff, Copy, Check, RefreshCw } from "lucide-react";
 
 // ── Password generator ────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ const positionColors = {
   Receptionist: "var(--color-success)",
 };
 
-export default function AddStaffModal({ onAdded }) {
+export default function AddStaffModal({ onAdded, forcePosition }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
@@ -58,7 +58,11 @@ export default function AddStaffModal({ onAdded }) {
 
   // ── Open / Close ─────────────────────────────────────────────────────────
   function handleOpen() {
-    setFormData(EMPTY_FORM(generatePassword()));
+    const defaultForm = EMPTY_FORM(generatePassword());
+    if (forcePosition) {
+      defaultForm.position = forcePosition;
+    }
+    setFormData(defaultForm);
     setShowPassword(true);
     setCopied(false);
     setDepartments([]);
@@ -149,7 +153,7 @@ export default function AddStaffModal({ onAdded }) {
         className="btn btn-primary flex items-center gap-2"
       >
         <Plus size={18} />
-        <span>Add Staff</span>
+        <span>{forcePosition === "Doctor" ? "Add Doctor" : "Add Staff"}</span>
       </button>
 
       {isOpen && (
@@ -157,12 +161,12 @@ export default function AddStaffModal({ onAdded }) {
           className="modal-overlay"
           onClick={(e) => e.target === e.currentTarget && handleClose()}
         >
-          <div className="modal-content" style={{ maxWidth: "32rem" }}>
+          <div className="modal-content" data-lenis-prevent style={{ maxWidth: "32rem" }}>
             {/* Header */}
             <div className="modal-header flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
-                  Create Staff Account
+                  {forcePosition === "Doctor" ? "Register Doctor" : "Create Staff Account"}
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "var(--color-text-secondary)" }}>
                   A secure password is auto-generated. Copy and share it with the staff member.
@@ -177,32 +181,34 @@ export default function AddStaffModal({ onAdded }) {
               <div className="flex flex-col gap-5">
 
                 {/* Role picker */}
-                <div>
-                  <label className="block mb-2" style={labelStyle}>Role / Position</label>
-                  <div className="flex gap-3">
-                    {["Receptionist", "Doctor", "Admin"].map((pos) => (
-                      <button
-                        key={pos}
-                        type="button"
-                        onClick={() => handlePositionChange(pos)}
-                        className="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all duration-200"
-                        style={{
-                          backgroundColor: formData.position === pos
-                            ? `color-mix(in srgb, ${positionColors[pos]} 15%, transparent)`
-                            : "var(--color-surface-secondary)",
-                          borderColor: formData.position === pos
-                            ? positionColors[pos]
-                            : "var(--color-border-default)",
-                          color: formData.position === pos
-                            ? positionColors[pos]
-                            : "var(--color-text-secondary)",
-                        }}
-                      >
-                        {pos}
-                      </button>
-                    ))}
+                {!forcePosition && (
+                  <div>
+                    <label className="block mb-2" style={labelStyle}>Role / Position</label>
+                    <div className="flex gap-3">
+                      {["Receptionist", "Doctor", "Admin"].map((pos) => (
+                        <button
+                          key={pos}
+                          type="button"
+                          onClick={() => handlePositionChange(pos)}
+                          className="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all duration-200"
+                          style={{
+                            backgroundColor: formData.position === pos
+                              ? `color-mix(in srgb, ${positionColors[pos]} 15%, transparent)`
+                              : "var(--color-surface-secondary)",
+                            borderColor: formData.position === pos
+                              ? positionColors[pos]
+                              : "var(--color-border-default)",
+                            color: formData.position === pos
+                              ? positionColors[pos]
+                              : "var(--color-text-secondary)",
+                          }}
+                        >
+                          {pos}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Username */}
                 <div>

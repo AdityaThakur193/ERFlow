@@ -28,6 +28,7 @@ const Department = mongoose.model("Department", new mongoose.Schema(
 
 const Doctor = mongoose.model("Doctor", new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     name: String, specialization: String, department: String,
     status: { type: String, enum: ["Available", "busy", "On Break"], default: "Available" },
     roomNumber: String,
@@ -127,6 +128,42 @@ const USERS_RAW = [
   { username: "Front Desk", email: "receptionist@example.com", position: "Receptionist", isAdmin: false },
 ];
 
+// 50 New Users Data
+const NEW_ADMINS = [
+  "Alexander Wright", "Beatrice Vance", "Charles Sterling", "Diana Prince", "Edward Thorne",
+  "Fiona Gallagher", "George Bennett", "Helena Rostova", "Ian Malcolm", "Julia Roberts",
+  "Kevin Bacon", "Laura Croft", "Marcus Aurelius", "Natalie Portman", "Oliver Queen"
+];
+
+const NEW_RECEPTIONISTS = [
+  "Penelope Cruz", "Quinn Fabray", "Rachel Green", "Samuel Jackson", "Tina Fey",
+  "Ulysses Grant", "Victoria Beckham", "William Shakespeare", "Xena Warrior", "Yolanda Hadid",
+  "Zachary Levi", "Alice Smith", "Bob Jones", "Charlie Brown", "Diana Ross"
+];
+
+const NEW_DOCTORS_RAW = [
+  { name: "Arthur Conan", specialization: "Neurology", department: "Neurology", roomNumber: "NR-402" },
+  { name: "Bruce Banner", specialization: "Trauma Surgery", department: "Trauma", roomNumber: "TR-203" },
+  { name: "Clark Kent", specialization: "Emergency Medicine", department: "Emergency", roomNumber: "ER-103" },
+  { name: "Donna Troy", specialization: "Pediatrics", department: "Pediatrics", roomNumber: "PD-602" },
+  { name: "Emma Watson", specialization: "Cardiology", department: "Cardiology", roomNumber: "CU-302" },
+  { name: "Frank Castle", specialization: "Trauma Surgery", department: "Trauma", roomNumber: "TR-204" },
+  { name: "Grace Hopper", specialization: "Neurology", department: "Neurology", roomNumber: "NR-403" },
+  { name: "Harry Potter", specialization: "Pediatrics", department: "Pediatrics", roomNumber: "PD-603" },
+  { name: "Iris West", specialization: "Cardiology", department: "Cardiology", roomNumber: "CU-303" },
+  { name: "John Watson", specialization: "Emergency Medicine", department: "Emergency", roomNumber: "ER-104" },
+  { name: "Katherine Pierce", specialization: "Anesthesiology", department: "ICU", roomNumber: "ICU-502" },
+  { name: "Logan Howlett", specialization: "Trauma Surgery", department: "Trauma", roomNumber: "TR-205" },
+  { name: "Michael Scott", specialization: "General Surgery", department: "Trauma", roomNumber: "TR-206" },
+  { name: "Nancy Drew", specialization: "Pediatrics", department: "Pediatrics", roomNumber: "PD-604" },
+  { name: "Peter Parker", specialization: "Emergency Medicine", department: "Emergency", roomNumber: "ER-105" },
+  { name: "Reed Richards", specialization: "Cardiology", department: "Cardiology", roomNumber: "CU-304" },
+  { name: "Stephen Strange", specialization: "Neurology", department: "Neurology", roomNumber: "NR-404" },
+  { name: "Tony Stark", specialization: "Anesthesiology", department: "ICU", roomNumber: "ICU-503" },
+  { name: "Victor Von", specialization: "General Surgery", department: "Trauma", roomNumber: "TR-207" },
+  { name: "Wanda Maximoff", specialization: "Pediatrics", department: "Pediatrics", roomNumber: "PD-605" }
+];
+
 // ─── SEED ────────────────────────────────────────────────────────────────────
 
 async function seed() {
@@ -149,12 +186,26 @@ async function seed() {
   const depts = await Department.insertMany(DEPARTMENTS);
   console.log(`✅ Created ${depts.length} departments`);
 
-  // 2. Doctors
-  const doctors = await Doctor.insertMany(DOCTORS_RAW);
+  // 2. Doctors (including new ones)
+  const allDoctorsRaw = [
+    ...DOCTORS_RAW,
+    ...NEW_DOCTORS_RAW.map(d => ({ ...d, status: "Available" }))
+  ];
+  const doctors = await Doctor.insertMany(allDoctorsRaw);
   console.log(`✅ Created ${doctors.length} doctors`);
 
   // 3. Patients
-  const patients = await Patient.insertMany(PATIENTS_RAW);
+  const arthurPatientsRaw = [
+    { name: "Eleanor Vance", age: 54, gender: "Female", symptoms: "Sudden onset hemiplegia, aphasia, and confusion. Suspected acute ischemic stroke.", priority: "Critical", department: "Neurology", status: "In treatment" },
+    { name: "Victor Frankenstein", age: 39, gender: "Male", symptoms: "Chronic intractable migraines, aura, severe photophobia. Admitted for IV cocktail.", priority: "High", department: "Neurology", status: "In treatment" },
+    { name: "Sherlock Holmes", age: 41, gender: "Male", symptoms: "Acute memory loss, disorientation, tremors in hands. Toxicological screen pending.", priority: "High", department: "Neurology", status: "Waiting" },
+    { name: "Bruce Wayne", age: 35, gender: "Male", symptoms: "Mild concussion following blunt force trauma to head. Under observation.", priority: "Medium", department: "Neurology", status: "In treatment" },
+    { name: "Wade Wilson", age: 32, gender: "Male", symptoms: "Peripheral neuropathy, numbness in extremities, chronic lower back pain.", priority: "Low", department: "Neurology", status: "Waiting" },
+    { name: "John Doe", age: 29, gender: "Male", symptoms: "Mild vertigo and headache. Symptoms resolved after IV fluids and rest.", priority: "Medium", department: "Neurology", status: "Completed" },
+    { name: "Jane Smith", age: 45, gender: "Female", symptoms: "Transient ischemic attack. Recovered fully, discharged.", priority: "High", department: "Neurology", status: "Completed" }
+  ];
+  const allPatientsRaw = [...PATIENTS_RAW, ...arthurPatientsRaw];
+  const patients = await Patient.insertMany(allPatientsRaw);
   console.log(`✅ Created ${patients.length} patients`);
 
   // 4. Equipment
@@ -162,11 +213,51 @@ async function seed() {
   console.log(`✅ Created ${equipment.length} equipment items`);
 
   // 5. Users
+  const adminUsers = NEW_ADMINS.map(name => ({
+    username: name,
+    email: `${name.toLowerCase().replace(/\s+/g, ".")}@example.com`,
+    position: "Admin",
+    isAdmin: true
+  }));
+
+  const receptionistUsers = NEW_RECEPTIONISTS.map(name => ({
+    username: name,
+    email: `${name.toLowerCase().replace(/\s+/g, ".")}@example.com`,
+    position: "Receptionist",
+    isAdmin: false
+  }));
+
+  const doctorUsers = NEW_DOCTORS_RAW.map(d => ({
+    username: `Dr. ${d.name}`,
+    email: `${d.name.toLowerCase().replace(/\s+/g, ".")}@example.com`,
+    position: "Doctor",
+    isAdmin: false
+  }));
+
+  const allUsersRaw = [
+    ...USERS_RAW,
+    ...adminUsers,
+    ...receptionistUsers,
+    ...doctorUsers
+  ];
+
   const salt = await bcryptjs.genSalt(10);
   const hashedPassword = await bcryptjs.hash("password123", salt);
-  const usersWithPasswords = USERS_RAW.map(u => ({ ...u, password: hashedPassword }));
+  const usersWithPasswords = allUsersRaw.map(u => ({ ...u, password: hashedPassword }));
   const users = await User.insertMany(usersWithPasswords);
   console.log(`✅ Created ${users.length} users\n`);
+
+  // Wire up Doctor-User relationships
+  for (const user of users) {
+    if (user.position === "Doctor") {
+      const doctorName = user.username.replace(/^Dr\.\s+/i, "");
+      await Doctor.findOneAndUpdate(
+        { name: { $regex: new RegExp("^" + doctorName + "$", "i") } },
+        { userId: user._id }
+      );
+    }
+  }
+  console.log("✅ Linked Doctor profiles with User accounts\n");
 
   // 5. Wire up relationships
   const find = (arr, name) => arr.find((x) => x.name === name);
@@ -204,16 +295,51 @@ async function seed() {
   await Patient.findByIdAndUpdate(sophia._id, { $push: { doctor: sarah._id } });
   await Doctor.findByIdAndUpdate(sarah._id, { $push: { patients: sophia._id }, $set: { status: "busy" } });
 
+  // Arthur Conan ← his patients
+  const arthur = find(doctors, "Arthur Conan");
+  if (arthur) {
+    const eleanor = find(patients, "Eleanor Vance");
+    const victor = find(patients, "Victor Frankenstein");
+    const sherlock = find(patients, "Sherlock Holmes");
+    const bruce = find(patients, "Bruce Wayne");
+    const wade = find(patients, "Wade Wilson");
+    const john = find(patients, "John Doe");
+    const jane = find(patients, "Jane Smith");
+
+    const arthurPatientIds = [eleanor, victor, sherlock, bruce, wade, john, jane]
+      .filter(p => p !== undefined)
+      .map(p => p._id);
+
+    // Update each patient to have Dr. Arthur Conan assigned
+    for (const pId of arthurPatientIds) {
+      await Patient.findByIdAndUpdate(pId, { $push: { doctor: arthur._id } });
+    }
+
+    // Update Dr. Arthur Conan to have these patients, and set status to busy
+    await Doctor.findByIdAndUpdate(arthur._id, {
+      $set: { patients: arthurPatientIds, status: "busy" }
+    });
+
+    // Assign a ventilator (Hamilton C6) to Eleanor Vance
+    const hamilton = find(equipment, "Hamilton C6 Ventilator");
+    if (hamilton && eleanor) {
+      await Patient.findByIdAndUpdate(eleanor._id, { $push: { equipment: hamilton._id } });
+      await Equipment.findByIdAndUpdate(hamilton._id, { $inc: { inventory: -1 }, assignedPatient: eleanor._id, status: "In Use" });
+    }
+  }
+
   console.log("✅ Relationships wired:");
   console.log("   • Marcus Johnson  (Cardiology Critical) ← Dr. Priya Sharma + Ventilator");
   console.log("   • Robert Nguyen   (Neurology Critical)  ← Dr. Omar Hassan + Monitor");
   console.log("   • Clara Fernandez (Trauma High)         ← Dr. James Chen + Dr. Ali Rahman");
   console.log("   • Sophia Kim      (Emergency High)      ← Dr. Sarah Mitchell");
+  console.log("   • Arthur Conan    (Neurology Mix)       ← 7 assigned patients + Hamilton Ventilator");
   
   console.log("\n🔑 Test Accounts (Password for all: password123):");
   console.log("   • Admin:        admin@example.com");
   console.log("   • Doctor:       doctor@example.com");
   console.log("   • Receptionist: receptionist@example.com");
+  console.log(`   • Plus 50 additional accounts (15 Admins, 15 Receptionists, 20 Doctors)`);
 
   console.log("\n🎉 Seed complete! Visit http://localhost:3000 to test.\n");
 

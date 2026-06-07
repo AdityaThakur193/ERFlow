@@ -1,5 +1,5 @@
 "use client";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
 
@@ -84,11 +84,12 @@ export default function AddPatientModal({ onAdded }) {
       {/* Open Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="btn btn-primary flex items-center gap-2"
-        style={{ fontSize: "0.875rem", fontWeight: "500" }}
+        className="btn btn-primary flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm shrink-0"
+        title="Register incoming patient"
+        aria-label="Register patient"
       >
-        <Plus size={18} />
-        <span>Add Patient</span>
+        <Plus size={16} />
+        <span className="hidden sm:inline">Add Patient</span>
       </button>
 
       {/* Modal */}
@@ -97,7 +98,7 @@ export default function AddPatientModal({ onAdded }) {
           className="modal-overlay"
           onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
         >
-          <div className="modal-content">
+          <div className="modal-content" data-lenis-prevent>
             {/* Header */}
             <div className="modal-header flex items-start justify-between">
               <div>

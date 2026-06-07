@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import { X, Stethoscope, Search, UserMinus } from "lucide-react";
 
 export default function AssignDoctorModal({ patientId, patientDepartment, assignedDoctors = [], onAssigned }) {
@@ -129,7 +129,7 @@ export default function AssignDoctorModal({ patientId, patientDepartment, assign
           className="modal-overlay"
           onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}
         >
-          <div className="modal-content" style={{ maxWidth: "600px" }}>
+          <div className="modal-content" data-lenis-prevent style={{ maxWidth: "600px" }}>
             {/* Header */}
             <div className="modal-header flex items-start justify-between">
               <div>

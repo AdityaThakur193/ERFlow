@@ -1,4 +1,18 @@
+import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import Providers from "@/components/Providors";
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "ERFlow",
@@ -7,26 +21,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-zinc-100 text-black">
-        <div className="min-h-screen flex flex-col">
-          {/* PAGE */}
-          <main className="flex-1">{children}</main>
-
-          {/* FOOTER */}
-          {/* <footer
-            className="
-              border-t border-zinc-200
-              bg-white
-              px-4 md:px-6
-              py-4
-              text-sm text-zinc-500
-            "
-          >
-            ERFlow Emergency Dashboard • Real-Time Hospital Monitoring System
-          </footer> */}
-        </div>
+    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+      <body className="min-h-screen">
+        <Providers>
+          <div className="min-h-screen flex flex-col">
+            {/* PAGE */}
+            <main className="flex-1">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
 }
+

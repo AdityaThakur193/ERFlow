@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import { X, Package } from "lucide-react";
 
 export default function AssignEquipmentModal({ equipmentId, equipmentName, inventory, onAssigned }) {
@@ -78,7 +78,7 @@ export default function AssignEquipmentModal({ equipmentId, equipmentName, inven
 
       {isOpen && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setIsOpen(false)}>
-          <div className="modal-content">
+          <div className="modal-content" data-lenis-prevent>
             <div className="modal-header flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>Assign Equipment</h2>

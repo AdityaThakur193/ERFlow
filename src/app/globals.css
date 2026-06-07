@@ -1,1 +1,625 @@
 @import "tailwindcss";
+
+/* ========================================
+   TAILWIND V4 DARK VARIANT BINDING
+   Map dark: classes to data-theme="dark"
+   ======================================== */
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ========================================
+   DESIGN SYSTEM: SAGE & OBSIDIAN CLINICAL
+   Hand-crafted, premium EMR workstation UI
+   ======================================== */
+
+:root {
+  /* Brand Typography Variables */
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+
+  /* Primary Brand Colors - Deep Sage Slate */
+  --color-primary: #2e4644;
+  --color-primary-light: #e6ebeb;
+  --color-primary-hover: #223533;
+  --color-primary-active: #1b2a28;
+
+  /* Accent - Medical Mint */
+  --color-accent: #0f9f90;
+  --color-accent-hover: #0c8276;
+  --color-accent-light: #e5f6f4;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #0ea5e9;
+
+  /* Backgrounds - Warm Chalk Cream */
+  --color-bg-primary: #faf9f5;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f2f1ec;
+
+  /* Surfaces */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #faf9f5;
+  --color-surface-hover: #f5f4ef;
+  --color-surface-active: #e8e7e0;
+
+  /* Borders - Soft Slate-Stones */
+  --color-border-light: #eae8df;
+  --color-border-default: #dfddd2;
+  --color-border-strong: #cdcac0;
+
+  /* Typography */
+  --color-text-primary: #141918;
+  --color-text-secondary: #3d4846;
+  --color-text-tertiary: #6e7e7a;
+  --color-text-disabled: #a5b3b0;
+  --color-text-inverse: #faf9f5;
+
+  /* Radius System - Softened for Clinical Use */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Shadows - Soft Gaussian */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px -2px rgba(20, 25, 24, 0.05);
+  --shadow-lg: 0 10px 25px -5px rgba(20, 25, 24, 0.06), 0 8px 10px -6px rgba(20, 25, 24, 0.06);
+  --shadow-xl: 0 20px 40px -10px rgba(20, 25, 24, 0.08), 0 10px 20px -8px rgba(20, 25, 24, 0.08);
+
+  /* Transitions */
+  --transition-fast: 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dark Theme Overrides - Obsidian Volcanic Glass */
+[data-theme="dark"] {
+  --color-primary: #0f9f90;
+  --color-primary-light: #162624;
+  --color-primary-hover: #1cc2b1;
+  --color-primary-active: #0c8276;
+
+  --color-accent: #0f9f90;
+  --color-accent-hover: #1cc2b1;
+  --color-accent-light: #162624;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #0ea5e9;
+
+  --color-bg-primary: #050808;      /* Obsidian Black */
+  --color-bg-secondary: #0a1110;    /* Dark Slate Slate */
+  --color-bg-tertiary: #101817;
+
+  --color-surface-primary: #0a1110;
+  --color-surface-secondary: #101817;
+  --color-surface-hover: #162220;
+  --color-surface-active: #223230;
+
+  --color-border-light: #182624;
+  --color-border-default: #253936;
+  --color-border-strong: #36534e;
+
+  --color-text-primary: #f2f7f6;
+  --color-text-secondary: #c4d6d3;
+  --color-text-tertiary: #8fa8a5;
+  --color-text-disabled: #546b68;
+  --color-text-inverse: #050808;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 10px 20px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* ========================================
+   GLOBAL RESETS
+   ======================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ========================================
+   CARDS & CLINICAL FILING
+   ======================================== */
+
+.card {
+  background-color: var(--color-surface-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.card-elevated {
+  background-color: var(--color-surface-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ========================================
+   EMR WORKSTATION MODE NAVIGATION KEYS
+   ======================================== */
+
+.emr-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.emr-tab:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-hover);
+}
+
+.emr-tab-active {
+  color: var(--color-accent) !important;
+  border-bottom: 2px solid var(--color-accent) !important;
+  background-color: var(--color-primary-light);
+}
+
+/* ========================================
+   METRIC BENTO BOXES
+   ======================================== */
+
+.metric-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-surface-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metric-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-card-1 {
+  border-left: 4px solid var(--color-primary);
+}
+
+.metric-card-2 {
+  border-left: 4px solid var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 3%, var(--color-surface-primary));
+}
+
+.metric-card-3 {
+  border-left: 4px solid var(--color-warning);
+  background-color: color-mix(in srgb, var(--color-warning) 3%, var(--color-surface-primary));
+}
+
+.metric-card-4 {
+  border-left: 4px solid var(--color-success);
+  background-color: color-mix(in srgb, var(--color-success) 3%, var(--color-surface-primary));
+}
+
+.metric-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: 1px solid var(--color-primary-active);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0px var(--color-primary-active);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0px var(--color-border-strong);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  color: #ffffff;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 10%, black);
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.95);
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0px color-mix(in srgb, var(--color-danger) 20%, black);
+}
+
+.btn-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-primary);
+  border: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  color: var(--color-text-primary);
+}
+
+.btn-icon:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-strong);
+  transform: translate(-1px, -1px);
+  box-shadow: 1px 1px 0px var(--color-border-default);
+}
+
+/* ========================================
+   INPUTS & SELECTS
+   ======================================== */
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  transition: all var(--transition-fast);
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236e7e7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem !important;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238fa8a5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.input::placeholder, .textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input:hover, .select:hover, .textarea:hover {
+  border-color: var(--color-border-strong);
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+/* Specificity fix for search icon inputs */
+.input.pl-9 {
+  padding-left: 2.25rem !important;
+}
+.input.pl-10 {
+  padding-left: 2.5rem !important;
+}
+.input.pl-11 {
+  padding-left: 2.75rem !important;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.badge-success, .badge-available {
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+.badge-warning, .badge-busy {
+  background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+  color: var(--color-warning);
+  border-color: color-mix(in srgb, var(--color-warning) 25%, transparent);
+}
+
+.badge-danger, .badge-critical {
+  background-color: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 25%, transparent);
+}
+
+.badge-info, .badge-active {
+  background-color: color-mix(in srgb, var(--color-info) 12%, transparent);
+  color: var(--color-info);
+  border-color: color-mix(in srgb, var(--color-info) 25%, transparent);
+}
+
+.badge-medium, .badge-low {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-default);
+}
+
+/* ========================================
+   CLINICAL LEDGER TABLES
+   ======================================== */
+
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-surface-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background-color: var(--color-surface-secondary);
+  border-bottom: 2px solid var(--color-border-strong);
+}
+
+.table th {
+  padding: 0.85rem 1.15rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 0.95rem 1.15rem;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 0.92rem;
+  color: var(--color-text-secondary);
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+/* ========================================
+   FORMS & LABELS
+   ======================================== */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+  color: var(--color-text-secondary);
+}
+
+.label-required::after {
+  content: " *";
+  color: var(--color-danger);
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 8, 0.65); /* Obsidian semi-transparent backdrop */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 38rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color-surface-primary);
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  animation: modalIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ========================================
+   MOBILE & RESPONSIVE OVERRIDES
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Prevent navigation tabs from shrinking and squishing on small screens */
+  .emr-tab {
+    flex: 1 0 30% !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    border-right: 1px solid var(--color-border-light) !important;
+    padding: 0.65rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .emr-tab:nth-child(3n) {
+    border-right: none !important;
+  }
+
+  /* Make tables more readable and hint scrollability */
+  .table-container {
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+}
+

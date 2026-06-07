@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { ShieldCheck } from "lucide-react";
 
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -63,14 +63,7 @@ export default function LoginPage() {
         backgroundColor: "var(--color-bg-primary)",
       }}
     >
-      <div
-        className="w-full max-w-md rounded-2xl p-8"
-        style={{
-          backgroundColor: "var(--color-surface-primary)",
-          border: "1px solid var(--color-border-light)",
-          boxShadow: "var(--shadow-md)",
-        }}
-      >
+      <div className="w-full max-w-md card p-8">
         {/* HEADER */}
         <div className="mb-6">
           <div className="flex items-center gap-2">

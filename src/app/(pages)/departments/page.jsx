@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Trash2, Plus, Building2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+
 
 export default function DepartmentsPage() {
   const [departments, setDepartments] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirm, setConfirm] = useState(null);
+
 
   async function getDepartments() {
     try {
@@ -50,8 +54,7 @@ export default function DepartmentsPage() {
     }
   }
 
-  async function handleDelete(id) {
-    if (!confirm("Delete this department? Patients/doctors assigned to it will retain the name but it will no longer appear in dropdowns.")) return;
+  async function deleteDepartment(id) {
     try {
       const res = await fetch("/api/departments", {
         method: "DELETE",
@@ -70,9 +73,12 @@ export default function DepartmentsPage() {
     }
   }
 
+
   return (
     <div className="space-y-6">
+      <ConfirmModal state={confirm} onClose={() => setConfirm(null)} />
       <div className="card p-6">
+
         <div className="flex items-center gap-3 mb-4">
           <Building2 size={22} style={{ color: "var(--color-primary)" }} />
           <div>
@@ -129,7 +135,7 @@ export default function DepartmentsPage() {
           </h3>
         </div>
         {departments.length > 0 ? (
-          <div className="divide-y" style={{ borderColor: "var(--color-border-light)" }}>
+          <div className="divide-y divide-[var(--color-border-light)]">
             {departments.map((dept) => (
               <div
                 key={dept._id}
@@ -145,12 +151,20 @@ export default function DepartmentsPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => handleDelete(dept._id)}
-                  className="btn btn-icon"
+                  onClick={() => setConfirm({
+                    title: "Delete Department",
+                    message: "Delete this department? Patients/doctors assigned to it will retain the name but it will no longer appear in dropdowns.",
+                    confirmLabel: "Delete",
+                    isDanger: true,
+                    onConfirm: () => deleteDepartment(dept._id),
+                  })}
+                  className="btn-icon"
                   title="Delete department"
+                  aria-label="Delete department"
                 >
-                  <Trash2 size={16} style={{ color: "var(--color-danger)" }} />
+                  <Trash2 size={15} color="var(--color-danger)" />
                 </button>
+
               </div>
             ))}
           </div>

@@ -1,93 +1,54 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
-import ToastProvider from "@/components/providors/ToastProvider";
-import Providers from "@/components/Providors";
-
-import Sidebar from "@/components/sidebar";
 import Header from "@/components/header";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export default function RootLayout({ children }) {
   return (
     <div
-      className={`
-        ${geistSans.variable}
-        ${geistMono.variable}
+      className="
         min-h-screen
         antialiased
         transition-colors duration-300
-      `}
+      "
       style={{
         backgroundColor: "var(--color-bg-primary)",
         color: "var(--color-text-primary)",
       }}
     >
-      <Providers>
-        <ToastProvider />
+      {/* Main Layout */}
+      <div className="min-h-screen flex flex-col">
+        {/* Header */}
+        <Header />
 
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Main Layout */}
-        <div
+        {/* Page Content */}
+        <main
           className="
-            min-h-screen
-            flex flex-col
-
-            md:pl-72
+            flex-1
+            w-full
+            max-w-7xl
+            mx-auto
+            p-4 md:p-6
+            overflow-x-hidden
           "
         >
-          {/* Header */}
-          <Header />
+          {children}
+        </main>
 
-          {/* Page Content */}
-          <main
-            className="
-              flex-1
-
-              w-full
-              max-w-full
-
-              p-4 md:p-6
-
-              pt-20 md:pt-6
-
-              overflow-x-hidden
-            "
-          >
-            {children}
-          </main>
-
-          {/* Footer */}
-          <footer
-            style={{
-              borderColor: "var(--color-border-light)",
-              backgroundColor: "var(--color-surface-secondary)",
-              color: "var(--color-text-secondary)",
-            }}
-            className="
-              border-t
-
-              px-4 md:px-6
-              py-4
-
-              text-sm
-            "
-          >
-            ERFlow Emergency Dashboard • Real-Time Hospital Monitoring System
-          </footer>
-        </div>
-      </Providers>
+        {/* Footer */}
+        <footer
+          style={{
+            borderColor: "var(--color-border-light)",
+            backgroundColor: "var(--color-surface-secondary)",
+            color: "var(--color-text-tertiary)",
+          }}
+          className="border-t px-6 py-5 text-xs font-sans text-center"
+        >
+          <div className="mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span className="font-semibold" style={{ color: "var(--color-text-secondary)" }}>ERFlow v1.0</span>
+            <span>Emergency Department Operations Platform &bull; Real-time Triage</span>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

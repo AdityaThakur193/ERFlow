@@ -14,7 +14,8 @@ import {
   RefreshCw,
   Circle,
 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 // ── Priority config ────────────────────────────────────────────────────────
 const PRIORITY = {
@@ -30,7 +31,7 @@ const PRIORITY = {
     color: "var(--color-warning)",
     bg: "color-mix(in srgb, var(--color-warning) 12%, transparent)",
     border: "color-mix(in srgb, var(--color-warning) 22%, transparent)",
-    badge: "badge-high",
+    badge: "badge-warning",
   },
   Medium: {
     icon: Minus,
@@ -57,8 +58,9 @@ const STATUS_BADGE = {
 export default function DoctorDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [assigningEquip, setAssigningEquip] = useState(null); // equipId being assigned
-  const [selectedPatient, setSelectedPatient] = useState(""); // patientId to assign equip to
+  const [assigningEquip, setAssigningEquip] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState("");
+  const [confirm, setConfirm] = useState(null);
 
   // ── Fetch all dashboard data ──────────────────────────────────────────────
   const fetchDashboard = useCallback(async () => {
@@ -84,7 +86,6 @@ export default function DoctorDashboard() {
 
   // ── Mark patient as completed ─────────────────────────────────────────────
   async function completePatient(patientId) {
-    if (!confirm("Mark this patient as Completed? This will free up assigned resources.")) return;
     try {
       const res = await fetch("/api/addpatient", {
         method: "PATCH",
@@ -168,15 +169,11 @@ export default function DoctorDashboard() {
 
   return (
     <div className="space-y-6">
+      <ConfirmModal state={confirm} onClose={() => setConfirm(null)} />
 
       {/* ── Doctor Profile Card ─────────────────────────────────────────── */}
       <div
-        className="rounded-2xl p-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
-        style={{
-          background: "linear-gradient(135deg, var(--color-surface-primary) 0%, var(--color-surface-secondary) 100%)",
-          border: "1px solid var(--color-border-default)",
-          boxShadow: "var(--shadow-md)",
-        }}
+        className="card p-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
       >
         <div className="flex items-center gap-4">
           <div
@@ -249,10 +246,10 @@ export default function DoctorDashboard() {
           return (
             <div
               key={level}
-              className="rounded-2xl p-5 flex flex-col gap-2"
+              className="card p-5 flex flex-col gap-2"
               style={{
                 backgroundColor: cfg.bg,
-                border: `1px solid ${cfg.border}`,
+                borderColor: cfg.border,
               }}
             >
               <div className="flex items-center justify-between">
@@ -273,10 +270,10 @@ export default function DoctorDashboard() {
 
         {/* Completed card */}
         <div
-          className="rounded-2xl p-5 flex flex-col gap-2"
+          className="card p-5 flex flex-col gap-2"
           style={{
-            backgroundColor: "color-mix(in srgb, var(--color-primary) 10%, transparent)",
-            border: "1px solid color-mix(in srgb, var(--color-primary) 20%, transparent)",
+            backgroundColor: "color-mix(in srgb, var(--color-primary) 8%, var(--color-surface-primary))",
+            borderColor: "var(--color-primary)",
           }}
         >
           <div className="flex items-center justify-between">
@@ -378,7 +375,13 @@ export default function DoctorDashboard() {
                       <td>
                         {patient.status !== "Completed" && (
                           <button
-                            onClick={() => completePatient(patient._id)}
+                            onClick={() => setConfirm({
+                              title: "Complete Treatment",
+                              message: `Mark ${patient.name} as Completed? This will free up assigned resources.`,
+                              confirmLabel: "Complete",
+                              isDanger: false,
+                              onConfirm: () => completePatient(patient._id),
+                            })}
                             className="btn btn-secondary text-xs py-1.5"
                           >
                             <CheckCircle2 size={14} />

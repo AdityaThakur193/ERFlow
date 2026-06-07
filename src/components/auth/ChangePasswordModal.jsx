@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "@/components/providors/CustomToast";
 import { X, KeyRound, Eye, EyeOff, Check, ShieldCheck } from "lucide-react";
 
-export default function ChangePasswordModal({ username }) {
+export default function ChangePasswordModal({ username, variant }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -102,21 +102,26 @@ export default function ChangePasswordModal({ username }) {
   return (
     <>
       {/* Trigger button */}
-      <button
-        id="change-password-btn"
-        onClick={() => setIsOpen(true)}
-        className="h-12 px-4 rounded-2xl border flex items-center gap-2 transition-all duration-200 whitespace-nowrap"
-        style={{
-          backgroundColor: "var(--color-surface-secondary)",
-          borderColor: "var(--color-border-light)",
-          color: "var(--color-text-primary)",
-        }}
-        title="Change your password"
-        aria-label="Change password"
-      >
-        <KeyRound size={18} />
-        <span className="hidden sm:inline text-sm font-medium">Password</span>
-      </button>
+      {variant === "menuItem" ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex w-full items-center gap-2 px-3 py-2 text-sm text-left hover:bg-[var(--color-surface-hover)] rounded-lg transition-colors cursor-pointer"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          <KeyRound size={14} style={{ color: "var(--color-text-secondary)" }} />
+          <span>Change Password</span>
+        </button>
+      ) : (
+        <button
+          id="change-password-btn"
+          onClick={() => setIsOpen(true)}
+          className="btn-icon shrink-0"
+          title="Change your password"
+          aria-label="Change password"
+        >
+          <KeyRound size={16} />
+        </button>
+      )}
 
       {/* Modal */}
       {isOpen && (
@@ -124,7 +129,7 @@ export default function ChangePasswordModal({ username }) {
           className="modal-overlay"
           onClick={(e) => e.target === e.currentTarget && handleClose()}
         >
-          <div className="modal-content" style={{ maxWidth: "26rem" }}>
+          <div className="modal-content" data-lenis-prevent style={{ maxWidth: "26rem" }}>
             {/* Header */}
             <div className="modal-header flex items-start justify-between">
               <div className="flex items-center gap-3">
