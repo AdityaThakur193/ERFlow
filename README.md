@@ -6,6 +6,17 @@
 
 ---
 
+## Demo Credentials
+
+To access the web application and test the different roles (Admin, Receptionist, Doctor), use the default Administrator account:
+
+* **Email**: `admin@erflow.com`
+* **Password**: `Admin@1234`
+
+*Note: Once logged in as an Administrator, you can navigate to the Staff panel to onboard new staff members (Receptionists or Doctors) to test their respective dashboards.*
+
+---
+
 ## About The Project
 
 ERFlow is a hospital emergency room management system built to simulate real-world emergency room operations.
