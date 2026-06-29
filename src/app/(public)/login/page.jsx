@@ -56,6 +56,42 @@ export default function LoginPage() {
     }
   }
 
+  async function handleDemoLogin() {
+    try {
+      setLoading(true);
+      setErrorMsg("");
+
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: "receptionist@example.com",
+          password: "password123",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Logged in as Receptionist!");
+        router.push("/dashboard");
+      } else {
+        const errorText = data.message || "Demo Login Failed";
+        setErrorMsg(errorText);
+        toast.error(errorText);
+      }
+    } catch (error) {
+      console.log(error);
+      const errorText = "Something went wrong";
+      setErrorMsg(errorText);
+      toast.error(errorText);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
@@ -83,6 +119,45 @@ export default function LoginPage() {
           >
             Access the ERFlow dashboard
           </p>
+        </div>
+
+        {/* DEMO CARD */}
+        <div 
+          className="mb-6 p-4 rounded-xl border flex flex-col gap-2.5 transition-all duration-300 hover:shadow-md"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--color-primary) 6%, var(--color-bg-secondary))",
+            borderColor: "var(--color-border-light)"
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">🚀</span>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--color-primary)" }}>
+                Demo Environment
+              </p>
+            </div>
+            <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: "color-mix(in srgb, var(--color-success) 12%, transparent)", color: "var(--color-success)" }}>
+              Ready to Explore
+            </span>
+          </div>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            Explore the platform instantly as a receptionist with preloaded mock patient and doctor data.
+          </p>
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="btn btn-secondary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2 group transition-all duration-200 cursor-pointer"
+            style={{ 
+              borderRadius: "var(--radius-md)", 
+              border: "1px solid var(--color-border-strong)",
+              backgroundColor: "var(--color-surface-primary)",
+              color: "var(--color-text-secondary)"
+            }}
+          >
+            <span>One-Click Demo Login</span>
+            <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+          </button>
         </div>
 
         {/* FORM */}

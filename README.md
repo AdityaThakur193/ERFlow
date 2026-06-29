@@ -8,12 +8,11 @@
 
 ## Demo Credentials
 
-To access the web application and test the different roles (Admin, Receptionist, Doctor), use the default Administrator account:
-
-* **Email**: `admin@erflow.com`
-* **Password**: `Admin@1234`
-
-*Note: Once logged in as an Administrator, you can navigate to the Staff panel to onboard new staff members (Receptionists or Doctors) to test their respective dashboards.*
+You can access and test the application instantly:
+* **One-Click Demo**: Click the **"One-Click Demo Login"** button on the Login page to instantly log in as the Receptionist.
+* **Credentials**:
+  * **Email**: `receptionist@example.com`
+  * **Password**: `password123`
 
 ---
 
@@ -166,3 +165,5 @@ ERFlow was built as a fast-paced MVP project focused on creating a realistic hea
 - **Architecture**: Unified User accounts and Doctor profiles with atomic database creation<br>
 - **Bug Fixes**: Resolved patient visibility bleed by strictly linking doctors via `userId`<br>
 - **Tooling**: Created `seed.js` and `reset.js` scripts for database management<br>
+- **Demo Mode**: Built a dedicated `seed-demo.js` script to populate clinical data with only receptionist user access<br>
+- **Demo Mode**: Added a beautiful "One-Click Demo Login" card on the Login screen for seamless user exploration<br>
